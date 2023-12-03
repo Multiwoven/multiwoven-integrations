@@ -2,6 +2,7 @@
 
 module Multiwoven
   module Integrations::Core
+    # TODO: enforce method signatures using sorbet
     class BaseConnector
       def spec
         # return connector spec

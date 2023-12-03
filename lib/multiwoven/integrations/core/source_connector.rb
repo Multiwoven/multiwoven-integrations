@@ -2,6 +2,7 @@
 
 module Multiwoven
   module Integrations::Core
+    # TODO: enforce method signatures using sorbet
     class SourceConnector < BaseConnector
       def discover(_connection_spec)
         raise "Not implemented"
