@@ -6,6 +6,7 @@ require "dry-schema"
 require "dry-types"
 require "byebug"
 require_relative "integrations/version"
+require_relative "integrations/core/utils"
 require_relative "integrations/protocol/protocol"
 
 module Multiwoven
