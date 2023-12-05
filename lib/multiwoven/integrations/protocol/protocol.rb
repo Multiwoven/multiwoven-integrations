@@ -26,11 +26,11 @@ module Multiwoven
     end
 
     class ConnectorSpecification < ProtocolModel
-      attribute? :documentationUrl, Types::String.optional
-      attribute? :changelogUrl, Types::String.optional
-      attribute :connectionSpecification, Types::Hash
-      attribute :supportsNormalization, Types::Bool.default(false)
-      attribute :supportsDBT, Types::Bool.default(false)
+      attribute? :documentation_url, Types::String.optional
+      attribute? :changelog_url, Types::String.optional
+      attribute :connection_specification, Types::Hash
+      attribute :supports_normalization, Types::Bool.default(false)
+      attribute :supports_dBT, Types::Bool.default(false)
       attribute? :supported_destination_sync_modes, Types::Array.of(DestinationSyncMode).optional
     end
 
