@@ -18,3 +18,7 @@ gem "dry-struct"
 gem "dry-types"
 
 gem "byebug"
+
+gem "sequel"
+
+gem "ruby-odbc", github: "subintp/ruby-odbc"

@@ -4,6 +4,8 @@ require "json"
 require "dry-struct"
 require "dry-schema"
 require "dry-types"
+require "odbc"
+require "sequel"
 require "byebug"
 # Core
 require_relative "integrations/version"
