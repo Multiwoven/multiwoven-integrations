@@ -48,20 +48,20 @@
     "ConnectorSpecification": {
       "type": "object",
       "properties": {
-        "documentationUrl": {
+        "documentation_url": {
           "type": "string"
         },
-        "changelogUrl": {
+        "changelog_url": {
           "type": "string"
         },
-        "connectionSpecification": {
+        "connection_specification": {
           "type": "object"
         },
-        "supportsNormalization": {
+        "supports_normalization": {
           "type": "boolean",
           "default": false
         },
-        "supportsDBT": {
+        "supports_dbt": {
           "type": "boolean",
           "default": false
         },

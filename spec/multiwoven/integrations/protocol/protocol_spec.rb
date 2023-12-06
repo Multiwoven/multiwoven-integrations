@@ -17,12 +17,12 @@ module Multiwoven
     RSpec.describe ConnectorSpecification do
       describe ".from_json" do
         it "creates an instance from JSON" do
-          json_data = '{"connectionSpecification": {"key": "value"}, "supportsNormalization": true, "supportsDBT": true, "supported_destination_sync_modes": ["append"]}'
+          json_data = '{"connection_specification": {"key": "value"}, "supports_normalization": true, "supports_dbt": true, "supported_destination_sync_modes": ["append"]}'
           instance = ConnectorSpecification.from_json(json_data)
           expect(instance).to be_a(ConnectorSpecification)
-          expect(instance.connectionSpecification).to eq(key: "value")
-          expect(instance.supportsNormalization).to eq(true)
-          expect(instance.supportsDBT).to eq(true)
+          expect(instance.connection_specification).to eq(key: "value")
+          expect(instance.supports_normalization).to eq(true)
+          expect(instance.supports_dbt).to eq(true)
           expect(instance.supported_destination_sync_modes).to eq(["append"])
         end
       end
