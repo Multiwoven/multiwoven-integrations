@@ -17,13 +17,13 @@ module Multiwoven
     RSpec.describe ConnectorSpecification do
       describe ".from_json" do
         it "creates an instance from JSON" do
-          json_data = '{"connection_specification": {"key": "value"}, "supports_normalization": true, "supports_dbt": true, "supported_destination_sync_modes": ["append"]}'
+          json_data = '{"connection_specification": {"key": "value"}, "supports_normalization": true, "supports_dbt": true, "supported_destination_sync_modes": ["insert"]}'
           instance = ConnectorSpecification.from_json(json_data)
           expect(instance).to be_a(ConnectorSpecification)
           expect(instance.connection_specification).to eq(key: "value")
           expect(instance.supports_normalization).to eq(true)
           expect(instance.supports_dbt).to eq(true)
-          expect(instance.supported_destination_sync_modes).to eq(["append"])
+          expect(instance.supported_destination_sync_modes).to eq(["insert"])
         end
       end
     end
@@ -51,10 +51,9 @@ module Multiwoven
     RSpec.describe RecordMessage do
       describe ".from_json" do
         it "creates an instance from JSON" do
-          json_data = '{"stream": "example_stream", "data": {"key": "value"}, "emitted_at": 1638449455000}'
+          json_data = '{ "data": {"key": "value"}, "emitted_at": 1638449455000}'
           instance = RecordMessage.from_json(json_data)
           expect(instance).to be_a(RecordMessage)
-          expect(instance.stream).to eq("example_stream")
           expect(instance.data).to eq(key: "value")
           expect(instance.emitted_at).to eq(1_638_449_455_000)
         end
@@ -89,13 +88,75 @@ module Multiwoven
     RSpec.describe SyncConfig do
       describe ".from_json" do
         it "creates an instance from JSON" do
-          json_data = '{"stream": {"name": "example_stream", "json_schema": {"type": "object"}, "supported_sync_modes": ["full_refresh"]}, "sync_mode": "full_refresh", "destination_sync_mode": "append"}'
-          instance = SyncConfig.from_json(json_data)
-          expect(instance).to be_a(SyncConfig)
-          expect(instance.stream).to be_a(Stream)
-          expect(instance.stream.name).to eq("example_stream")
-          expect(instance.sync_mode).to eq("full_refresh")
-          expect(instance.destination_sync_mode).to eq("append")
+          json_data = {
+            "source": {
+              "name": "example_source",
+              "type": "source",
+              "connection_specification": { "key": "value" }
+            },
+            "destination": {
+              "name": "example_destination",
+              "type": "destination",
+              "connection_specification": { "key": "value" }
+            },
+            "model": {
+              "name": "example_model",
+              "query": "SELECT * FROM customers",
+              "query_type": "raw_sql",
+              "primary_key": "id"
+            },
+            "sync_mode": "full_refresh",
+            "destination_sync_mode": "insert"
+          }.to_json
+
+          sync_config = described_class.from_json(json_data)
+
+          expect(sync_config).to be_a(described_class)
+          expect(sync_config.source).to be_a(Connector)
+          expect(sync_config.source.name).to eq("example_source")
+          expect(sync_config.destination).to be_a(Connector)
+          expect(sync_config.destination.name).to eq("example_destination")
+          expect(sync_config.model).to be_a(Model)
+          expect(sync_config.model.name).to eq("example_model")
+          expect(sync_config.sync_mode).to eq("full_refresh")
+        end
+      end
+    end
+
+    RSpec.describe Model do
+      describe ".from_json" do
+        it "creates an instance from JSON" do
+          json_data = {
+            "name": "example_model",
+            "query": "SELECT * FROM customers",
+            "query_type": "raw_sql",
+            "primary_key": "id"
+          }.to_json
+          model = Model.from_json(json_data)
+
+          expect(model).to be_a(described_class)
+          expect(model.name).to eq("example_model")
+          expect(model.query).to eq("SELECT * FROM customers")
+          expect(model.query_type).to eq("raw_sql")
+          expect(model.primary_key).to eq("id")
+        end
+      end
+    end
+
+    RSpec.describe Connector do
+      describe ".from_json" do
+        it "creates an instance from JSON" do
+          json_data =  {
+            "name": "example_connector",
+            "type": "source",
+            "connection_specification": { "key": "value" }
+          }.to_json
+
+          connector = Connector.from_json(json_data)
+          expect(connector).to be_a(described_class)
+          expect(connector.name).to eq("example_connector")
+          expect(connector.type).to eq("source")
+          expect(connector.connection_specification).to eq(key: "value")
         end
       end
     end

@@ -6,7 +6,7 @@ module Multiwoven
       describe "#write" do
         it "raises an error for not being implemented" do
           connector = described_class.new
-          expect { connector.write({}, {}, {}) }.to raise_error("Not implemented")
+          expect { connector.write({}, {}) }.to raise_error("Not implemented")
         end
       end
     end

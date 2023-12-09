@@ -2,7 +2,6 @@
 
 module Multiwoven
   module Integrations::Core
-    # TODO: enforce method signatures using sorbet
     class BaseConnector
       include Integrations::Protocol
       include Utils
@@ -19,7 +18,7 @@ module Multiwoven
         @meta_data ||= read_json(META_DATA_PATH).to_h
       end
 
-      def check_connection(_config)
+      def check_connection(_connection_config)
         raise "Not implemented"
         # returns Protocol.ConnectionStatus
       end

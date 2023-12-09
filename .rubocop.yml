@@ -17,3 +17,9 @@ Style/ClassAndModuleChildren:
 
 Style/Documentation:
   Enabled: false
+
+Layout/Metrics/ModuleLength:
+  Max: 500
+
+Layout/Metrics/BlockLength:
+  Max: 40
