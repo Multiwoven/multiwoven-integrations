@@ -18,9 +18,17 @@ module Multiwoven::Integrations::Source
         # return catalog
       end
 
-      def read(_sync_config)
-        raise "Not implemented"
-        # return list of record message
+      def read(sync_config)
+        connection_config = sync_config.source.connection_specification
+        query = sync_config.model.query
+        db = create_connection(connection_config)
+
+        records = []
+        db.fetch(query) do |row|
+          records << RecordMessage.new(data: row, emitted_at: Time.now.to_i)
+        end
+
+        records
       end
 
       private
