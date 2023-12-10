@@ -23,3 +23,6 @@ Layout/Metrics/ModuleLength:
 
 Layout/Metrics/BlockLength:
   Max: 40
+
+Layout/Metrics/AbcSize:
+  Max: 30

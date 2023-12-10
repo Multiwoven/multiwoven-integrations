@@ -11,6 +11,7 @@ module Multiwoven
     DestinationSyncMode = Types::String.enum("insert", "upsert")
     ConnectorType = Types::String.enum("source", "destination")
     ModelQueryType = Types::String.enum("raw_sql", "dbt")
+    ConnectionStatusType = Types::String.enum("succeeded", "failed")
 
     class ProtocolModel < Dry::Struct
       extend Multiwoven::Integrations::Core::Utils
@@ -23,8 +24,8 @@ module Multiwoven
     end
 
     class ConnectionStatus < ProtocolModel
-      attribute :status, Types::String.enum("succeeded", "failed")
-      attribute :message, Types::String.optional
+      attribute :status, ConnectionStatusType
+      attribute? :message, Types::String.optional
     end
 
     class ConnectorSpecification < ProtocolModel
