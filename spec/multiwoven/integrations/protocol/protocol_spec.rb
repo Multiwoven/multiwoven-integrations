@@ -63,11 +63,11 @@ module Multiwoven
     RSpec.describe Stream do
       describe ".from_json" do
         it "creates an instance from JSON" do
-          json_data = '{"name": "example_stream", "json_schema": {"type": "object"}, "supported_sync_modes": ["full_refresh"]}'
+          json_data = '{"name": "example_stream", "json_schema": [{"type": "object"}], "supported_sync_modes": ["full_refresh"]}'
           instance = Stream.from_json(json_data)
           expect(instance).to be_a(Stream)
           expect(instance.name).to eq("example_stream")
-          expect(instance.json_schema).to eq(type: "object")
+          expect(instance.json_schema).to eq([type: "object"])
           expect(instance.supported_sync_modes).to eq(["full_refresh"])
         end
       end
@@ -76,7 +76,7 @@ module Multiwoven
     RSpec.describe Catalog do
       describe ".from_json" do
         it "creates an instance from JSON" do
-          json_data = '{"streams": [{"name": "example_stream", "json_schema": {"type": "object"}, "supported_sync_modes": ["full_refresh"]}]}'
+          json_data = '{"streams": [{"name": "example_stream", "json_schema": [{"type": "object"}], "supported_sync_modes": ["full_refresh"]}]}'
           instance = Catalog.from_json(json_data)
           expect(instance).to be_a(Catalog)
           expect(instance.streams.first).to be_a(Stream)

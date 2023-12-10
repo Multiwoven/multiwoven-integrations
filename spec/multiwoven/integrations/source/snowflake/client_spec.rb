@@ -2,6 +2,7 @@
 
 RSpec.describe Multiwoven::Integrations::Source::Snowflake::Client do
   let(:client) { Multiwoven::Integrations::Source::Snowflake::Client.new }
+  # TODO: Move to test helpers
   let(:sync_config) do
     {
       "source": {
@@ -75,6 +76,36 @@ RSpec.describe Multiwoven::Integrations::Source::Snowflake::Client do
       expect(first_record).to be_a(Multiwoven::Integrations::Protocol::RecordMessage)
       expect(first_record.data).to eq(id: 1, name: "John")
       expect(first_record.emitted_at).to be_an(Integer)
+    end
+  end
+
+  describe "#discover" do
+    it "discover schema successfully" do
+      allow(Sequel).to receive(:odbc).and_return(double("db").as_null_object)
+      allow_any_instance_of(RSpec::Mocks::Double).to receive(:fetch).and_yield(
+        table_name: "TEST_TABLE",
+        column_name: "ID",
+        data_type: "NUMBER",
+        is_nullable: "YES"
+      )
+
+      streams = client.discover(sync_config[:source][:connection_specification])
+
+      expect(streams).to be_an(Array)
+      expect(streams.length).to eq(1)
+
+      first_stream = streams.first
+      expect(first_stream).to be_a(Multiwoven::Integrations::Protocol::Stream)
+      expect(first_stream.name).to eq("TEST_TABLE")
+      expect(first_stream.json_schema).to be_an(Array)
+      expect(first_stream.json_schema.length).to eq(1)
+
+      first_column = first_stream.json_schema.first
+      expect(first_column).to eq(
+        column_name: "ID",
+        type: "NUMBER",
+        optional: true
+      )
     end
   end
 end
