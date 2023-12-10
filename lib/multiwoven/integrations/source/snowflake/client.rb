@@ -15,7 +15,7 @@ module Multiwoven::Integrations::Source
         query = "SELECT table_name, column_name, data_type, is_nullable
                 FROM information_schema.columns
                 WHERE table_schema = \'#{connection_config[:schema]}\' AND table_catalog = \'#{connection_config[:database]}\'
-                ORDER BY table_name, ordinal_position LIMIT 10;"
+                ORDER BY table_name, ordinal_position;"
 
         db = create_connection(connection_config)
 
@@ -48,19 +48,12 @@ module Multiwoven::Integrations::Source
       end
 
       def generate_drvconnect(connection_config)
-        username = connection_config[:credentials][:username]
-        password = connection_config[:credentials][:password]
-        host = connection_config[:host]
-        warehouse = connection_config[:warehouse]
-        database = connection_config[:database]
-        schema = connection_config[:schema]
-
-        "driver=#{SNOWFLAKE_DRIVER_PATH};server=#{host};uid=#{username};pwd=#{password};schema=#{schema};database=#{database};warehouse=#{warehouse};"
+        c = connection_config[:credentials]
+        "driver=#{SNOWFLAKE_DRIVER_PATH};server=#{connection_config[:host]};uid=#{c[:username]};pwd=#{c[:password]};schema=#{connection_config[:schema]};database=#{connection_config[:database]};warehouse=#{connection_config[:warehouse]};"
       end
 
       def create_streams(records)
-        records = group_by_table(records)
-        records.map do |r|
+        group_by_table(records).map do |r|
           Multiwoven::Integrations::Protocol::Stream.new(name: r[:tablename], json_schema: r[:columns])
         end
       end
