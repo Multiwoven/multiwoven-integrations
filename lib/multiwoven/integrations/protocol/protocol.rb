@@ -12,6 +12,7 @@ module Multiwoven
     ConnectorType = Types::String.enum("source", "destination")
     ModelQueryType = Types::String.enum("raw_sql", "dbt")
     ConnectionStatusType = Types::String.enum("succeeded", "failed")
+    StreamType = Types::String.enum("static", "dynamic")
 
     class ProtocolModel < Dry::Struct
       extend Multiwoven::Integrations::Core::Utils
@@ -34,6 +35,7 @@ module Multiwoven
       attribute :connection_specification, Types::Hash
       attribute :supports_normalization, Types::Bool.default(false)
       attribute :supports_dbt, Types::Bool.default(false)
+      attribute :stream_type, StreamType
       attribute? :supported_destination_sync_modes, Types::Array.of(DestinationSyncMode).optional
     end
 
