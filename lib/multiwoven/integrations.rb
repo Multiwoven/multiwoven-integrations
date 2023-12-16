@@ -7,6 +7,7 @@ require "dry-types"
 require "odbc"
 require "sequel"
 require "byebug"
+
 # Core
 require_relative "integrations/version"
 require_relative "integrations/core/constants"
@@ -18,6 +19,9 @@ require_relative "integrations/core/destination_connector"
 
 # Source
 require_relative "integrations/source/snowflake/client"
+
+# Destination
+require_relative "integrations/destination/klaviyo/client"
 
 module Multiwoven
   module Integrations
