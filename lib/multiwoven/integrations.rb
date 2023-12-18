@@ -7,6 +7,8 @@ require "dry-types"
 require "odbc"
 require "sequel"
 require "byebug"
+require 'net/http'
+require 'uri'
 
 # Core
 require_relative "integrations/version"
@@ -16,6 +18,7 @@ require_relative "integrations/protocol/protocol"
 require_relative "integrations/core/base_connector"
 require_relative "integrations/core/source_connector"
 require_relative "integrations/core/destination_connector"
+require_relative "integrations/core/http_client"
 
 # Source
 require_relative "integrations/source/snowflake/client"
