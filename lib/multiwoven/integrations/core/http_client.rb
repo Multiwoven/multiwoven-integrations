@@ -2,8 +2,7 @@
 
 module Multiwoven
   module Integrations::Core
-    class HttpClent
-      
+    class HttpClient
       class << self
 
         def request(url, method, payload: nil, headers: {}) 
@@ -20,10 +19,10 @@ module Multiwoven
     
         def build_request(method, uri, payload, headers)
           request_class = case method.upcase
-            when 'GET' then Net::HTTP::Get
-            when 'POST' then Net::HTTP::Post
-            when 'PUT' then Net::HTTP::Put
-            when 'DELETE' then Net::HTTP::Delete
+            when Constants::HTTP_GET then Net::HTTP::Get
+            when Constants::HTTP_POST then Net::HTTP::Post
+            when Constants::HTTP_PUT then Net::HTTP::Put
+            when Constants::HTTP_DELETE then Net::HTTP::Delete
             else raise ArgumentError, "Unsupported HTTP method: #{method}"
             end
 

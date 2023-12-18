@@ -2,7 +2,7 @@
 
 module Multiwoven
   module Integrations::Core
-    RSpec.describe HttpClent do
+    RSpec.describe HttpClient do
       describe '.request' do
         let(:url) { 'http://example.com' }
         let(:headers) { { 'Content-Type' => 'application/json' } }
