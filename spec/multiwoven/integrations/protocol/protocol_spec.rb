@@ -63,6 +63,7 @@ module Multiwoven
     RSpec.describe Stream do
       describe ".from_json" do
         it "creates an instance from JSON" do
+          # TODO: move test json to different module
           json_data = {
             "name": "example_stream",
             "json_schema": [
