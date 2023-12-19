@@ -7,11 +7,17 @@ module Multiwoven::Integrations::Destination
 
       def check_connection(connection_config)
         api_key = connection_config[:private_api_key]
-        url = "#{KLAVIYO_AUTH_ENDPOINT}?api_key=#{api_key}"
 
         response = Multiwoven::Integrations::Core::HttpClient.request(
-          url, HTTP_GET,
-          headers: { 'Accept' => 'application/json' }
+          KLAVIYO_AUTH_ENDPOINT,
+          HTTP_POST,
+          payload: KLAVIYO_AUTH_PAYLOAD,
+          headers: {
+            "Accept" => "application/json",
+            "Authorization" => "Klaviyo-API-Key #{api_key}",
+            "Revision" => "2023-02-22",
+            "Content-Type" => "application/json"
+          }
         )
         parse_response(response)
       end
@@ -19,7 +25,7 @@ module Multiwoven::Integrations::Destination
       private
 
       def parse_response(response)
-        if response[:status] == '200'
+        if response && %w[200 201].include?(response.code)
           ConnectionStatus.new(status: ConnectionStatusType["succeeded"])
         else
           message = extract_message(response)
@@ -28,7 +34,9 @@ module Multiwoven::Integrations::Destination
       end
 
       def extract_message(response)
-        JSON.parse(response[:body])["message"] rescue "Klaviyo auth failed"
+        JSON.parse(response.body)["message"]
+      rescue StandardError => e
+        "Klaviyo auth failed: #{e.message}"
       end
     end
   end

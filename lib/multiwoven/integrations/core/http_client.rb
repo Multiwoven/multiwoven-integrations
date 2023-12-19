@@ -4,17 +4,14 @@ module Multiwoven
   module Integrations::Core
     class HttpClient
       class << self
-
-        def request(url, method, payload: nil, headers: {}) 
+        def request(url, method, payload: nil, headers: {})
           uri = URI(url)
           http = Net::HTTP.new(uri.host, uri.port)
-          http.use_ssl = (uri.scheme == 'https')
-    
+          http.use_ssl = (uri.scheme == "https")
           request = build_request(method, uri, payload, headers)
-    
           http.request(request)
         end
-    
+
         private
     
         def build_request(method, uri, payload, headers)
@@ -27,7 +24,6 @@ module Multiwoven
             end
 
           request = request_class.new(uri)
-    
           headers.each { |key, value| request[key] = value }
           request.body = payload.to_json if payload && %w[POST PUT].include?(method.upcase)
           request
