@@ -13,15 +13,15 @@ module Multiwoven
         end
 
         private
-    
+
         def build_request(method, uri, payload, headers)
           request_class = case method.upcase
-            when Constants::HTTP_GET then Net::HTTP::Get
-            when Constants::HTTP_POST then Net::HTTP::Post
-            when Constants::HTTP_PUT then Net::HTTP::Put
-            when Constants::HTTP_DELETE then Net::HTTP::Delete
-            else raise ArgumentError, "Unsupported HTTP method: #{method}"
-            end
+                          when Constants::HTTP_GET then Net::HTTP::Get
+                          when Constants::HTTP_POST then Net::HTTP::Post
+                          when Constants::HTTP_PUT then Net::HTTP::Put
+                          when Constants::HTTP_DELETE then Net::HTTP::Delete
+                          else raise ArgumentError, "Unsupported HTTP method: #{method}"
+                          end
 
           request = request_class.new(uri)
           headers.each { |key, value| request[key] = value }

@@ -82,7 +82,7 @@ module Multiwoven
       attribute :destination, Connector
       attribute :model, Model
       attribute :sync_mode, SyncMode
-      attribute? :cursor_field, Types::Array.of(Types::String).optional #TODO: move to model
+      attribute? :cursor_field, Types::Array.of(Types::String).optional # TODO: move to model
       attribute :destination_sync_mode, DestinationSyncMode
     end
   end

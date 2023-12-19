@@ -21,8 +21,7 @@ RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do
     end
 
     context "when the connection is successful" do
-
-      let(:response_body) { {"message" => "success" }.to_json }
+      let(:response_body) { { "message" => "success" }.to_json }
       before do
         response = Net::HTTPSuccess.new("1.1", "201", "Unauthorized")
         response.content_type = "application/json"
@@ -38,7 +37,7 @@ RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do
 
     context "when the connection fails" do
       let(:error_message) { "Invalid API Key" }
-      let(:response_body) { {"message" => error_message }.to_json }
+      let(:response_body) { { "message" => error_message }.to_json }
       before do
         response = Net::HTTPUnauthorized.new("1.1", "401", "Unauthorized")
         response.content_type = "application/json"

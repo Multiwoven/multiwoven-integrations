@@ -4,7 +4,6 @@ module Multiwoven::Integrations::Destination
   module Klaviyo
     include Multiwoven::Integrations::Core
     class Client < DestinationConnector
-
       def check_connection(connection_config)
         api_key = connection_config[:private_api_key]
 

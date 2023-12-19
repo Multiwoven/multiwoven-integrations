@@ -7,8 +7,8 @@ require "dry-types"
 require "odbc"
 require "sequel"
 require "byebug"
-require 'net/http'
-require 'uri'
+require "net/http"
+require "uri"
 
 # Core
 require_relative "integrations/version"
