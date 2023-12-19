@@ -36,7 +36,7 @@ RSpec.describe Multiwoven::Integrations::Source::Snowflake::Client do
         "primary_key": "id"
       },
       "sync_mode": "full_refresh",
-      "cursor_field": ["timestamp"],
+      "cursor_field": "timestamp",
       "destination_sync_mode": "upsert"
     }
   end

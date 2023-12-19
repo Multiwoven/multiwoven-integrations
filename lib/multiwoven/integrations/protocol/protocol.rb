@@ -64,13 +64,18 @@ module Multiwoven
     end
 
     class Stream < ProtocolModel
+      # Common
       attribute :name, Types::String
       attribute :json_schema, Types::Array.of(Types::Hash)
       attribute? :supported_sync_modes, Types::Array.of(SyncMode).optional
+
       attribute? :source_defined_cursor, Types::Bool.optional
       attribute? :default_cursor_field, Types::Array.of(Types::String).optional
       attribute? :source_defined_primary_key, Types::Array.of(Types::Array.of(Types::String)).optional
       attribute? :namespace, Types::String.optional
+      # Applicable for API streams
+      attribute? :url, Types::String.optional
+      attribute? :method, Types::String.optional
     end
 
     class Catalog < ProtocolModel
@@ -82,7 +87,7 @@ module Multiwoven
       attribute :destination, Connector
       attribute :model, Model
       attribute :sync_mode, SyncMode
-      attribute? :cursor_field, Types::Array.of(Types::String).optional # TODO: move to model
+      attribute? :cursor_field, Types::String.optional
       attribute :destination_sync_mode, DestinationSyncMode
     end
   end

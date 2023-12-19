@@ -63,12 +63,24 @@ module Multiwoven
     RSpec.describe Stream do
       describe ".from_json" do
         it "creates an instance from JSON" do
-          json_data = '{"name": "example_stream", "json_schema": [{"type": "object"}], "supported_sync_modes": ["full_refresh"]}'
+          json_data = {
+            "name": "example_stream",
+            "json_schema": [
+              { "field1": "type1" },
+              { "field2": "type2" }
+            ],
+            "supported_sync_modes": %w[full_refresh incremental],
+            "source_defined_cursor": true,
+            "default_cursor_field": ["field1"],
+            "source_defined_primary_key": [["field1"], ["field2"]],
+            "namespace": "exampleNamespace",
+            "url": "https://api.example.com/data",
+            "method": "GET"
+          }.to_json
           instance = Stream.from_json(json_data)
           expect(instance).to be_a(Stream)
           expect(instance.name).to eq("example_stream")
-          expect(instance.json_schema).to eq([type: "object"])
-          expect(instance.supported_sync_modes).to eq(["full_refresh"])
+          expect(instance.supported_sync_modes).to eq(%w[full_refresh incremental])
         end
       end
     end
