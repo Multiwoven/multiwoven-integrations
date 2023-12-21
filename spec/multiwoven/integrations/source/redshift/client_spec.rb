@@ -2,6 +2,11 @@
 
 RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
     let(:client) { Multiwoven::Integrations::Source::Redshift::Client.new }
+    let(:mock_connection) { instance_double("PG::Connection") }
+
+    before do
+      allow(PG).to receive(:connect).and_return(mock_connection)
+    end
     let(:sync_config) do
         {
           "source": {
