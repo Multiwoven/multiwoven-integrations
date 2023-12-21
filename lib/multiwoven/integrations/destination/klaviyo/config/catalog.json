@@ -2,6 +2,9 @@
     "streams": [
       {
         "name": "profile",
+        "action": "create",
+        "url": "https://a.klaviyo.com/api/profiles",
+        "method": "POST",
         "json_schema": {
           "type": "object",
           "additionalProperties": true,
@@ -60,12 +63,6 @@
                   ],
                   "additionalProperties": true
                 },
-                "subscriptions": {
-                  "type": [
-                    "null",
-                    "object"
-                  ]
-                },
                 "organization": {
                   "type": [
                     "null",
@@ -120,9 +117,8 @@
             "id",
             "email"
           ]
-        ],
-        "url": "https://a.klaviyo.com/api/profiles",
-        "method": "POST"
+        ]
+        
       }
     ]
   }

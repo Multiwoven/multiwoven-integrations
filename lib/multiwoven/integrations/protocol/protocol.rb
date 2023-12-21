@@ -13,7 +13,7 @@ module Multiwoven
     ModelQueryType = Types::String.enum("raw_sql", "dbt")
     ConnectionStatusType = Types::String.enum("succeeded", "failed")
     StreamType = Types::String.enum("static", "dynamic")
-
+    StreamAction = Types::String.enum("fetch", "create", "update", "delete")
     class ProtocolModel < Dry::Struct
       extend Multiwoven::Integrations::Core::Utils
       class << self
@@ -66,6 +66,7 @@ module Multiwoven
     class Stream < ProtocolModel
       # Common
       attribute :name, Types::String
+      attribute :action, StreamAction
       attribute :json_schema, Types::Array.of(Types::Hash)
       attribute? :supported_sync_modes, Types::Array.of(SyncMode).optional
 

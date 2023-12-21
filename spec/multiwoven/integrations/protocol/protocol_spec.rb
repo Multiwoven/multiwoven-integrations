@@ -65,7 +65,7 @@ module Multiwoven
         it "creates an instance from JSON" do
           # TODO: move test json to different module
           json_data = {
-            "name": "example_stream",
+            "name": "example_stream","action": "create",
             "json_schema": [
               { "field1": "type1" },
               { "field2": "type2" }
@@ -89,7 +89,7 @@ module Multiwoven
     RSpec.describe Catalog do
       describe ".from_json" do
         it "creates an instance from JSON" do
-          json_data = '{"streams": [{"name": "example_stream", "json_schema": [{"type": "object"}], "supported_sync_modes": ["full_refresh"]}]}'
+          json_data = '{"streams": [{"name": "example_stream","action": "create", "json_schema": [{"type": "object"}], "supported_sync_modes": ["full_refresh"]}]}'
           instance = Catalog.from_json(json_data)
           expect(instance).to be_a(Catalog)
           expect(instance.streams.first).to be_a(Stream)

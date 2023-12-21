@@ -55,7 +55,7 @@ module Multiwoven::Integrations::Source
       def create_streams(records)
         group_by_table(records).map do |r|
           # TODO: Json schema instead of dumping the columns
-          Multiwoven::Integrations::Protocol::Stream.new(name: r[:tablename], json_schema: r[:columns])
+          Multiwoven::Integrations::Protocol::Stream.new(name: r[:tablename], action: StreamAction["fetch"], json_schema: r[:columns])
         end
       end
 
