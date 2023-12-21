@@ -18,6 +18,7 @@ require_relative "integrations/core/destination_connector"
 
 # Source
 require_relative "integrations/source/snowflake/client"
+require_relative "integrations/source/redshift/client"
 
 module Multiwoven
   module Integrations

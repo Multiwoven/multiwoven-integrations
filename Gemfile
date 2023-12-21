@@ -21,4 +21,6 @@ gem "byebug"
 
 gem "sequel"
 
+gem 'pg'
+
 gem "ruby-odbc", github: "subintp/ruby-odbc"
