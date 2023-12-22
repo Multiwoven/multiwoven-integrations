@@ -87,6 +87,7 @@ module Multiwoven
       attribute :source, Connector
       attribute :destination, Connector
       attribute :model, Model
+      attribute :stream, Stream
       attribute :sync_mode, SyncMode
       attribute? :cursor_field, Types::String.optional
       attribute :destination_sync_mode, DestinationSyncMode

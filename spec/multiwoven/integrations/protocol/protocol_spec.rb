@@ -65,7 +65,7 @@ module Multiwoven
         it "creates an instance from JSON" do
           # TODO: move test json to different module
           json_data = {
-            "name": "example_stream","action": "create",
+            "name": "example_stream", "action": "create",
             "json_schema": [
               { "field1": "type1" },
               { "field2": "type2" }
@@ -117,6 +117,21 @@ module Multiwoven
               "query": "SELECT * FROM customers",
               "query_type": "raw_sql",
               "primary_key": "id"
+            },
+
+            "stream": {
+              "name": "example_stream", "action": "create",
+              "json_schema": [
+                { "field1": "type1" },
+                { "field2": "type2" }
+              ],
+              "supported_sync_modes": %w[full_refresh incremental],
+              "source_defined_cursor": true,
+              "default_cursor_field": ["field1"],
+              "source_defined_primary_key": [["field1"], ["field2"]],
+              "namespace": "exampleNamespace",
+              "url": "https://api.example.com/data",
+              "method": "GET"
             },
             "sync_mode": "full_refresh",
             "destination_sync_mode": "insert"

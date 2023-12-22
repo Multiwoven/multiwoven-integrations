@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Multiwoven::Integrations::Source::Snowflake::Client do
+RSpec.describe Multiwoven::Integrations::Source::Snowflake::Client do # rubocop:disable Metrics/BlockLength
   let(:client) { Multiwoven::Integrations::Source::Snowflake::Client.new }
   # TODO: Move to test helpers
   let(:sync_config) do
@@ -34,6 +34,20 @@ RSpec.describe Multiwoven::Integrations::Source::Snowflake::Client do
         "query": "SELECT * FROM CALL_CENTER LIMIT 1",
         "query_type": "raw_sql",
         "primary_key": "id"
+      },
+      "stream": {
+        "name": "example_stream", "action": "create",
+        "json_schema": [
+          { "field1": "type1" },
+          { "field2": "type2" }
+        ],
+        "supported_sync_modes": %w[full_refresh incremental],
+        "source_defined_cursor": true,
+        "default_cursor_field": ["field1"],
+        "source_defined_primary_key": [["field1"], ["field2"]],
+        "namespace": "exampleNamespace",
+        "url": "https://api.example.com/data",
+        "method": "GET"
       },
       "sync_mode": "full_refresh",
       "cursor_field": "timestamp",
