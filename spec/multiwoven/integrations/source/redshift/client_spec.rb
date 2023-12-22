@@ -2,11 +2,7 @@
 
 RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
     let(:client) { Multiwoven::Integrations::Source::Redshift::Client.new }
-    let(:mock_connection) { instance_double("PG::Connection") }
 
-    before do
-      allow(PG).to receive(:connect).and_return(mock_connection)
-    end
     let(:sync_config) do
         {
           "source": {
@@ -15,18 +11,25 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
             "connection_specification": {
               "credentials": {
                 "auth_type": "username/password",
-                "username": "REDSHIFT_USERNAME",
-                "password": "REDSHIFT_PASSWORD"
+                "username": ENV['REDSHIFT_USERNAME'],
+                "password": ENV['REDSHIFT_PASSWORD']
               },
-              "host": "example-redshift-cluster.abcdefg.us-west-2.redshift.amazonaws.com",
-              "port": "5439", 
-              "database": "REDSHIFT_DB",
-              "schema": "REDSHIFT_SCHEMA"
+              "host": ENV['HOST'],
+              "port": ENV['PORT'], 
+              "database": ENV['DATABASE'],
+              "schema": ENV['SCHEMA']
+            }
+          },
+          "destination": {
+            "name": "DestinationConnectorName",
+            "type": "destination",
+            "connection_specification": {
+              "example_destination_key": "example_destination_value"
             }
           },
           "model": {
             "name": "ExampleRedshiftModel",
-            "query": "SELECT * FROM example_table LIMIT 10;",
+            "query": "SELECT * FROM contacts LIMIT 10;",
             "query_type": "raw_sql",
             "primary_key": "id"
           },
@@ -57,6 +60,17 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
       end
     end
   
-    # Define #read and #discover tests for Redshift
+    #read and #discover tests for Redshift
+    describe "#read" do
+      context "when reading records from a real Redshift database" do
+        it "reads records successfully" do
+          records = client.read(Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json))
+
+          expect(records).to be_an(Array)
+          expect(records).not_to be_empty
+          expect(records.first).to be_a(Multiwoven::Integrations::Protocol::RecordMessage)
+        end
+      end
+    end
   end
   
