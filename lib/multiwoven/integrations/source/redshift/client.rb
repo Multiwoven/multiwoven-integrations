@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pg'
+require "pg"
 
 module Multiwoven::Integrations::Source
   module Redshift
@@ -29,7 +29,7 @@ module Multiwoven::Integrations::Source
         end
         create_streams(records)
       ensure
-        db.close if db
+        db&.close
       end
 
       def read(sync_config)
@@ -46,7 +46,7 @@ module Multiwoven::Integrations::Source
 
         records
       ensure
-        db.close if db
+        db&.close
       end
 
       private
@@ -70,16 +70,16 @@ module Multiwoven::Integrations::Source
       end
 
       def group_by_table(records)
-        records.group_by { |entry| entry['table_name'] }.map do |table_name, columns|
+        records.group_by { |entry| entry["table_name"] }.map do |table_name, columns|
           {
             tablename: table_name,
-            columns: columns.map { |column| 
-              { 
-                column_name: column['column_name'], 
-                type: column['data_type'], 
-                optional: column['is_nullable'] == 'YES' 
-              } 
-            }
+            columns: columns.map do |column|
+              {
+                column_name: column["column_name"],
+                type: column["data_type"],
+                optional: column["is_nullable"] == "YES"
+              }
+            end
           }
         end
       end
