@@ -26,3 +26,6 @@ Layout/Metrics/BlockLength:
 
 Layout/Metrics/AbcSize:
   Max: 30
+
+Metrics/MethodLength:
+  Max: 50

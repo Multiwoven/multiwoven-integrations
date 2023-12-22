@@ -2,21 +2,6 @@
 
 RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
   let(:client) { Multiwoven::Integrations::Source::Redshift::Client.new }
-  let(:mock_connection) { instance_double("PG::Connection") }
-  # let(:fake_result) { instance_double("PG::Result") }
-  before do
-    allow(PG).to receive(:connect).and_return(mock_connection)
-    # allow(fake_result).to receive(:each).and_yield(
-    #   id: 1, name: "John"
-    # ).and_yield(
-    #   id: 2, name: "Jane"
-    # )
-    fake_result = [{id: 1, name: "John"},{id: 2, name: "Jane"}]
-    allow(mock_connection).to receive(:exec).and_return(fake_result)
-    
-    allow(mock_connection).to receive(:close)
-  end
-
   let(:sync_config) do
     {
       "source": {
@@ -52,6 +37,10 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
       "destination_sync_mode": "upsert"
     }
   end
+
+  let(:pg_connection) { instance_double(PG::Connection) }
+  let(:pg_result) { instance_double(PG::Result) }
+
   describe "#check_connection" do
     context "when the connection is successful" do
       it "returns a succeeded connection status" do
@@ -77,14 +66,51 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
   # read and #discover tests for Redshift
   describe "#read" do
     context "when reading records from a real Redshift database" do
-      xit "reads records successfully" do
-        records = client.read(Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json))
+      it "reads records successfully" do
+        s_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json)
+        allow(PG).to receive(:connect).and_return(pg_connection)
 
+        allow(pg_connection).to receive(:exec).with(s_config.model.query).and_return(
+          [
+            Multiwoven::Integrations::Protocol::RecordMessage.new(
+              data: { column1: "column1" }, emitted_at: Time.now.to_i
+            ),
+            Multiwoven::Integrations::Protocol::RecordMessage.new(
+              data: { column2: "column2" }, emitted_at: Time.now.to_i
+            )
+          ]
+        )
+        allow(pg_connection).to receive(:close).and_return(true)
+        records = client.read(s_config)
         expect(records).to be_an(Array)
-        
         expect(records).not_to be_empty
         expect(records.first).to be_a(Multiwoven::Integrations::Protocol::RecordMessage)
       end
     end
   end
+
+  describe "#discover" do
+  context "when reading records from a real Redshift database" do
+    it "reads records successfully" do
+      s_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json)
+      allow(PG).to receive(:connect).and_return(pg_connection)
+
+      allow(pg_connection).to receive(:exec).with(s_config.model.query).and_return(
+        [
+          Multiwoven::Integrations::Protocol::RecordMessage.new(
+            data: { column1: "column1" }, emitted_at: Time.now.to_i
+          ),
+          Multiwoven::Integrations::Protocol::RecordMessage.new(
+            data: { column2: "column2" }, emitted_at: Time.now.to_i
+          )
+        ]
+      )
+      allow(pg_connection).to receive(:close).and_return(true)
+      records = client.read(s_config)
+      expect(records).to be_an(Array)
+      expect(records).not_to be_empty
+      expect(records.first).to be_a(Multiwoven::Integrations::Protocol::RecordMessage)
+    end
+  end
+end
 end

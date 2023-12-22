@@ -36,17 +36,12 @@ module Multiwoven::Integrations::Source
         connection_config = sync_config.source.connection_specification
         query = sync_config.model.query
         db = create_connection(connection_config)
-        
-        records = []
-        db.exec(query) do |result|
-          
-          result.each do |row|
-            records << RecordMessage.new(data: row, emitted_at: Time.now.to_i)
+        records = db.exec(query) do |result|
+          result.map do |row|
+            RecordMessage.new(data: row, emitted_at: Time.now.to_i)
           end
         end
-
         records
-        
       ensure
         db&.close
       end
