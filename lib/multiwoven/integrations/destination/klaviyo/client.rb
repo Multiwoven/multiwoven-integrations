@@ -49,8 +49,6 @@ module Multiwoven::Integrations::Destination
               payload: record,
               headers: auth_headers(connection_config["private_api_key"])
             )
-
-
             if success?(response)
               tracker[:success] += 1
             else
