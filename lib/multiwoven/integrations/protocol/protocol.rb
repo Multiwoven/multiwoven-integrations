@@ -66,8 +66,8 @@ module Multiwoven
     class Stream < ProtocolModel
       # Common
       attribute :name, Types::String
-      attribute :action, StreamAction
-      attribute :json_schema, Types::Array.of(Types::Hash)
+      attribute? :action, StreamAction
+      attribute :json_schema, Types::Hash
       attribute? :supported_sync_modes, Types::Array.of(SyncMode).optional
 
       attribute? :source_defined_cursor, Types::Bool.optional

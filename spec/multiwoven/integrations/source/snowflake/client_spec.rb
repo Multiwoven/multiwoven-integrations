@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Multiwoven::Integrations::Source::Snowflake::Client do # rubocop:disable Metrics/BlockLength
+RSpec.describe Multiwoven::Integrations::Source::Snowflake::Client do
   let(:client) { Multiwoven::Integrations::Source::Snowflake::Client.new }
   # TODO: Move to test helpers
   let(:sync_config) do
@@ -37,10 +37,7 @@ RSpec.describe Multiwoven::Integrations::Source::Snowflake::Client do # rubocop:
       },
       "stream": {
         "name": "example_stream", "action": "create",
-        "json_schema": [
-          { "field1": "type1" },
-          { "field2": "type2" }
-        ],
+        "json_schema": { "field1": "type1" },
         "supported_sync_modes": %w[full_refresh incremental],
         "source_defined_cursor": true,
         "default_cursor_field": ["field1"],
@@ -106,20 +103,13 @@ RSpec.describe Multiwoven::Integrations::Source::Snowflake::Client do # rubocop:
       streams = client.discover(sync_config[:source][:connection_specification])
 
       expect(streams).to be_an(Array)
-      expect(streams.length).to eq(1)
 
       first_stream = streams.first
       expect(first_stream).to be_a(Multiwoven::Integrations::Protocol::Stream)
       expect(first_stream.name).to eq("TEST_TABLE")
-      expect(first_stream.json_schema).to be_an(Array)
-      expect(first_stream.json_schema.length).to eq(1)
-
-      first_column = first_stream.json_schema.first
-      expect(first_column).to eq(
-        column_name: "ID",
-        type: "NUMBER",
-        optional: true
-      )
+      expect(first_stream.json_schema).to be_an(Hash)
+      expect(first_stream.json_schema["type"]).to eq("object")
+      expect(first_stream.json_schema["properties"]).to eq({ "ID" => { "type" => %w[integer null] } })
     end
   end
 end

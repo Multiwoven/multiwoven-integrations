@@ -25,7 +25,6 @@ module Multiwoven
 
       def discover(_connection_config)
         raise "Not implemented"
-        # return catalog
       end
 
       private

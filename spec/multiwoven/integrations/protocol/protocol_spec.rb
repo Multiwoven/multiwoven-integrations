@@ -66,10 +66,7 @@ module Multiwoven
           # TODO: move test json to different module
           json_data = {
             "name": "example_stream", "action": "create",
-            "json_schema": [
-              { "field1": "type1" },
-              { "field2": "type2" }
-            ],
+            "json_schema": { "field1": "type1" },
             "supported_sync_modes": %w[full_refresh incremental],
             "source_defined_cursor": true,
             "default_cursor_field": ["field1"],
@@ -89,7 +86,7 @@ module Multiwoven
     RSpec.describe Catalog do
       describe ".from_json" do
         it "creates an instance from JSON" do
-          json_data = '{"streams": [{"name": "example_stream","action": "create", "json_schema": [{"type": "object"}], "supported_sync_modes": ["full_refresh"]}]}'
+          json_data = '{"streams": [{"name": "example_stream","action": "create", "json_schema": {"type": "object"}, "supported_sync_modes": ["full_refresh"]}]}'
           instance = Catalog.from_json(json_data)
           expect(instance).to be_a(Catalog)
           expect(instance.streams.first).to be_a(Stream)
@@ -121,10 +118,7 @@ module Multiwoven
 
             "stream": {
               "name": "example_stream", "action": "create",
-              "json_schema": [
-                { "field1": "type1" },
-                { "field2": "type2" }
-              ],
+              "json_schema": { "field1": "type1" },
               "supported_sync_modes": %w[full_refresh incremental],
               "source_defined_cursor": true,
               "default_cursor_field": ["field1"],

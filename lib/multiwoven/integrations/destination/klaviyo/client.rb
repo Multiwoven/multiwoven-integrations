@@ -21,6 +21,20 @@ module Multiwoven::Integrations::Destination
         parse_response(response)
       end
 
+      def discover
+        catalog = read_json(CATALOG_SPEC_PATH)
+
+        catalog["streams"].map do |stream|
+          Multiwoven::Integrations::Protocol::Stream.new(
+            name: stream["name"],
+            json_schema: stream["json_schema"],
+            url: stream["url"],
+            method: stream["method"],
+            action: stream["action"]
+          )
+        end
+      end
+
       private
 
       def parse_response(response)
