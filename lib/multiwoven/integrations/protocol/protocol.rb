@@ -76,7 +76,7 @@ module Multiwoven
       attribute? :namespace, Types::String.optional
       # Applicable for API streams
       attribute? :url, Types::String.optional
-      attribute? :method, Types::String.optional
+      attribute? :request_method, Types::String.optional
     end
 
     class Catalog < ProtocolModel

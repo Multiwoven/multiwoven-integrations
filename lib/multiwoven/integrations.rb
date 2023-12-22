@@ -9,6 +9,7 @@ require "sequel"
 require "byebug"
 require "net/http"
 require "uri"
+require "active_support/core_ext/hash/indifferent_access"
 
 # Core
 require_relative "integrations/version"

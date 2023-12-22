@@ -24,3 +24,5 @@ gem "sequel"
 gem "ruby-odbc", github: "subintp/ruby-odbc"
 
 gem "webmock", "~> 3.0"
+
+gem "activesupport"

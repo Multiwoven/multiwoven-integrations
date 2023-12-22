@@ -73,10 +73,11 @@ module Multiwoven
             "source_defined_primary_key": [["field1"], ["field2"]],
             "namespace": "exampleNamespace",
             "url": "https://api.example.com/data",
-            "method": "GET"
+            "request_method": "GET"
           }.to_json
           instance = Stream.from_json(json_data)
           expect(instance).to be_a(Stream)
+
           expect(instance.name).to eq("example_stream")
           expect(instance.supported_sync_modes).to eq(%w[full_refresh incremental])
         end
@@ -125,7 +126,7 @@ module Multiwoven
               "source_defined_primary_key": [["field1"], ["field2"]],
               "namespace": "exampleNamespace",
               "url": "https://api.example.com/data",
-              "method": "GET"
+              "request_method": "GET"
             },
             "sync_mode": "full_refresh",
             "destination_sync_mode": "insert"

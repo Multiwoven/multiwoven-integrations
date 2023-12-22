@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do
+RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do # rubocop:disable Metrics/BlockLength
+  include WebMock::API
+
+  before(:each) do
+    WebMock.disable_net_connect!(allow_localhost: true)
+  end
+
   describe "#check_connection" do
     let(:api_key) { "test_api_key" }
     let(:connection_config) { { private_api_key: api_key } }
@@ -64,6 +70,82 @@ RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do
         result = subject.check_connection(connection_config)
         expect(result.status).to eq(Multiwoven::Integrations::Protocol::ConnectionStatusType["failed"])
         expect(result.message).to include("Klaviyo auth failed")
+      end
+    end
+  end
+
+  describe "#write" do
+    let(:sync_config_json) do
+      {
+        "source": {
+          "name": "SourceConnectorName",
+          "type": "source",
+          "connection_specification": {
+            "private_api_key": "test"
+          }
+        },
+        "destination": {
+          "name": "DestinationConnectorName",
+          "type": "destination",
+          "connection_specification": {
+            "private_api_key": "test"
+          }
+        },
+        "model": {
+          "name": "ExampleModel",
+          "query": "SELECT * FROM CALL_CENTER LIMIT 1",
+          "query_type": "raw_sql",
+          "primary_key": "id"
+        },
+        "stream": {
+          "name": "example_stream", "action": "create",
+          "json_schema": { "field1": "type1" },
+          "supported_sync_modes": %w[full_refresh incremental],
+          "source_defined_cursor": true,
+          "default_cursor_field": ["field1"],
+          "source_defined_primary_key": [["field1"], ["field2"]],
+          "namespace": "exampleNamespace",
+          "url": "https://api.example.com/data",
+          "request_method": "POST"
+        },
+        "sync_mode": "full_refresh",
+        "cursor_field": "timestamp",
+        "destination_sync_mode": "upsert"
+      }
+    end
+
+    let(:records) do
+      [{ data: { id: 1, name: "Sample Record 1" }, emitted_at: Time.now.to_i },
+       { data: { id: 2, name: "Sample Record 2" }, emitted_at: Time.now.to_i }]
+    end
+
+    context "when the write is successful" do
+      it "increments the success count" do
+        sync_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(
+          sync_config_json.to_json
+        )
+
+        stub_request(:any, sync_config.stream.url)
+          .to_return(status: 200, body: '{"message": "Success"}')
+        tracker = subject.write(sync_config, records)
+
+        expect(tracker[:success]).to eq(records.count)
+        expect(tracker[:failed]).to eq(0)
+      end
+    end
+
+    context "when the write operation fails" do
+      it "increments the failure count" do
+        sync_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(
+          sync_config_json.to_json
+        )
+        stub_request(:any, sync_config.stream.url)
+          .to_return(status: 500, body: '{"message": "Error"}')
+
+        tracker = subject.write(sync_config, records)
+
+        expect(tracker[:failed]).to eq(records.count)
+        expect(tracker[:success]).to eq(0)
       end
     end
   end

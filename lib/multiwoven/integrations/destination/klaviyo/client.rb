@@ -11,12 +11,7 @@ module Multiwoven::Integrations::Destination
           KLAVIYO_AUTH_ENDPOINT,
           HTTP_POST,
           payload: KLAVIYO_AUTH_PAYLOAD,
-          headers: {
-            "Accept" => "application/json",
-            "Authorization" => "Klaviyo-API-Key #{api_key}",
-            "Revision" => "2023-02-22",
-            "Content-Type" => "application/json"
-          }
+          headers: auth_headers(api_key)
         )
         parse_response(response)
       end
@@ -35,10 +30,45 @@ module Multiwoven::Integrations::Destination
         end
       end
 
+      def write(sync_config, records, _action = "insert")
+        connection_config = sync_config.destination.connection_specification
+        url = sync_config.stream.url
+        request_method = sync_config.stream.request_method
+
+        # TODO: Standerdise this across connectors
+        tracker = {
+          success: 0,
+          failed: 0
+        }
+
+        records.each do |record|
+          begin # rubocop:disable Style/RedundantBegin
+            response = Multiwoven::Integrations::Core::HttpClient.request(
+              url,
+              request_method,
+              payload: record,
+              headers: auth_headers(connection_config["private_api_key"])
+            )
+
+
+            if success?(response)
+              tracker[:success] += 1
+            else
+              tracker[:failed] += 1
+            end
+          rescue StandardError
+            # TODO: Handle ratelimiting
+            # TODO: Log error message
+            tracker[:failed] += 1
+          end
+        end
+        tracker
+      end
+
       private
 
       def parse_response(response)
-        if response && %w[200 201].include?(response.code)
+        if success?(response)
           ConnectionStatus.new(status: ConnectionStatusType["succeeded"])
         else
           message = extract_message(response)
@@ -46,10 +76,23 @@ module Multiwoven::Integrations::Destination
         end
       end
 
+      def success?(response)
+        response && %w[200 201].include?(response.code)
+      end
+
       def extract_message(response)
         JSON.parse(response.body)["message"]
       rescue StandardError => e
         "Klaviyo auth failed: #{e.message}"
+      end
+
+      def auth_headers(api_key)
+        {
+          "Accept" => "application/json",
+          "Authorization" => "Klaviyo-API-Key #{api_key}",
+          "Revision" => "2023-02-22",
+          "Content-Type" => "application/json"
+        }
       end
     end
   end
