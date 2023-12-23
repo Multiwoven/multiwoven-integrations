@@ -30,7 +30,7 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
         "name": "ExampleRedshiftModel",
         "query": "SELECT * FROM contacts LIMIT 10;",
         "query_type": "raw_sql",
-        "primary_key": "id",
+        "primary_key": "id"
       },
       "stream": {
         "name": "example_stream", "action": "create",
