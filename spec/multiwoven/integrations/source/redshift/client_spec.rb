@@ -30,10 +30,21 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
         "name": "ExampleRedshiftModel",
         "query": "SELECT * FROM contacts LIMIT 10;",
         "query_type": "raw_sql",
-        "primary_key": "id"
+        "primary_key": "id",
+      },
+      "stream": {
+        "name": "example_stream", "action": "create",
+        "json_schema": { "field1": "type1" },
+        "supported_sync_modes": %w[full_refresh incremental],
+        "source_defined_cursor": true,
+        "default_cursor_field": ["field1"],
+        "source_defined_primary_key": [["field1"], ["field2"]],
+        "namespace": "exampleNamespace",
+        "url": "https://api.example.com/data",
+        "method": "GET"
       },
       "sync_mode": "full_refresh",
-      "cursor_field": ["timestamp"],
+      "cursor_field": "timestamp",
       "destination_sync_mode": "upsert"
     }
   end
@@ -45,7 +56,7 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
     context "when the connection is successful" do
       it "returns a succeeded connection status" do
         allow(Sequel).to receive(:postgres).and_return(true)
-
+        allow(PG).to receive(:connect).and_return(pg_connection)
         result = client.check_connection(sync_config[:source][:connection_specification])
         expect(result.status).to eq("succeeded")
         expect(result.message).to be_nil
@@ -90,27 +101,27 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
   end
 
   describe "#discover" do
-  context "when reading records from a real Redshift database" do
-    it "reads records successfully" do
-      s_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json)
-      allow(PG).to receive(:connect).and_return(pg_connection)
+    context "when reading records from a real Redshift database" do
+      it "reads records successfully" do
+        s_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json)
+        allow(PG).to receive(:connect).and_return(pg_connection)
 
-      allow(pg_connection).to receive(:exec).with(s_config.model.query).and_return(
-        [
-          Multiwoven::Integrations::Protocol::RecordMessage.new(
-            data: { column1: "column1" }, emitted_at: Time.now.to_i
-          ),
-          Multiwoven::Integrations::Protocol::RecordMessage.new(
-            data: { column2: "column2" }, emitted_at: Time.now.to_i
-          )
-        ]
-      )
-      allow(pg_connection).to receive(:close).and_return(true)
-      records = client.read(s_config)
-      expect(records).to be_an(Array)
-      expect(records).not_to be_empty
-      expect(records.first).to be_a(Multiwoven::Integrations::Protocol::RecordMessage)
+        allow(pg_connection).to receive(:exec).with(s_config.model.query).and_return(
+          [
+            Multiwoven::Integrations::Protocol::RecordMessage.new(
+              data: { column1: "column1" }, emitted_at: Time.now.to_i
+            ),
+            Multiwoven::Integrations::Protocol::RecordMessage.new(
+              data: { column2: "column2" }, emitted_at: Time.now.to_i
+            )
+          ]
+        )
+        allow(pg_connection).to receive(:close).and_return(true)
+        records = client.read(s_config)
+        expect(records).to be_an(Array)
+        expect(records).not_to be_empty
+        expect(records.first).to be_a(Multiwoven::Integrations::Protocol::RecordMessage)
+      end
     end
   end
-end
 end
