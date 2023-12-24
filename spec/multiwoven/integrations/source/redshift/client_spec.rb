@@ -13,10 +13,10 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
             "username": ENV["REDSHIFT_USERNAME"],
             "password": ENV["REDSHIFT_PASSWORD"]
           },
-          "host": ENV["HOST"],
-          "port": ENV["PORT"],
-          "database": ENV["DATABASE"],
-          "schema": ENV["SCHEMA"]
+          "host": "test.pg.com",
+          "port": "8080",
+          "database": "test_database",
+          "schema": "test_schema"
         }
       },
       "destination": {
@@ -102,22 +102,22 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
 
   describe "#discover" do
     it "discovers schema successfully" do
-      s_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json)
       allow(PG).to receive(:connect).and_return(pg_connection)
       discovery_query = "SELECT table_name, column_name, data_type, is_nullable\n" \
                       "                 FROM information_schema.columns\n" \
-                      "                 WHERE table_schema = 'public' AND table_catalog = 'dev'\n" \
+                      "                 WHERE table_schema = 'test_schema' AND table_catalog = 'test_database'\n" \
                       "                 ORDER BY table_name, ordinal_position;"
       allow(pg_connection).to receive(:exec).with(discovery_query).and_return(
-        [{ 'table_name' => "combined_users", 'column_name' => "city", 'data_type' => "varchar", 'is_nullable' => "YES" }]
+        [
+          {
+            "table_name" => "combined_users", "column_name" => "city", "data_type" => "varchar", "is_nullable" => "YES"
+          }
+        ]
       )
-                      
       allow(pg_connection).to receive(:close).and_return(true)
-      
       streams = client.discover(sync_config[:source][:connection_specification])
-        
-      expect(streams).to be_an(Array)
 
+      expect(streams).to be_an(Array)
       first_stream = streams.first
       expect(first_stream).to be_a(Multiwoven::Integrations::Protocol::Stream)
       expect(first_stream.name).to eq("combined_users")

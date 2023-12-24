@@ -20,11 +20,9 @@ module Multiwoven::Integrations::Source
                  ORDER BY table_name, ordinal_position;"
 
         db = create_connection(connection_config)
-        
-        records = []
-        db.exec(query) do |result|
-          result.each do |row|
-            records << row
+        records = db.exec(query) do |result|
+          result.map do |row|
+            row
           end
         end
         create_streams(records)
@@ -50,7 +48,7 @@ module Multiwoven::Integrations::Source
 
       def create_connection(connection_config)
         raise "Unsupported Auth type" unless connection_config[:credentials][:auth_type] == "username/password"
-        
+
         PG.connect(
           host: connection_config[:host],
           dbname: connection_config[:database],
