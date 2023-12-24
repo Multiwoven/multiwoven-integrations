@@ -123,6 +123,7 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
       expect(first_stream.name).to eq("combined_users")
       expect(first_stream.json_schema).to be_an(Hash)
       expect(first_stream.json_schema["type"]).to eq("object")
+      expect(first_stream.json_schema["properties"]).to eq({ "city" => { "type" => %w[string null] } })
     end
   end
 end
