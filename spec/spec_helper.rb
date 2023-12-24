@@ -4,8 +4,10 @@ require "multiwoven/integrations"
 require "webmock/rspec"
 
 require "simplecov"
-SimpleCov.start do
-  add_filter "/spec/" # Filters out spec directory from coverage metrics
+SimpleCov.start "rails" do
+  add_filter "/bin/"
+  add_filter "/db/"
+  add_filter "/spec/" # Do not include test code
 end
 
 RSpec.configure do |config|
