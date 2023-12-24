@@ -4,8 +4,9 @@ require "multiwoven/integrations"
 require "webmock/rspec"
 
 require "simplecov"
-require "simplecov_json_formatter"
-SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter
+SimpleCov.start do
+  add_filter "/spec/" # Filters out spec directory from coverage metrics
+end
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

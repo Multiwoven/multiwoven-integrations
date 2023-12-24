@@ -50,4 +50,5 @@ jobs:
     - name: Upload Coverage to Code Climate
       run: |
         ./cc-test-reporter before-build
+        ./cc-test-reporter format-coverage -t simplecov -o coverage/codeclimate.json
         ./cc-test-reporter after-build --exit-code $?
