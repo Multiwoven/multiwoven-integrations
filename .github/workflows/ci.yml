@@ -39,9 +39,6 @@ jobs:
     - name: Bundle Install
       run: bundle install
 
-    - name: Database Setup
-      run: bundle exec rake db:create db:schema:load --trace
-
     - name: Run Tests
       run: bundle exec rspec
 
