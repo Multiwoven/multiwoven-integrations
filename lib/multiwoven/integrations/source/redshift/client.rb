@@ -20,7 +20,7 @@ module Multiwoven::Integrations::Source
                  ORDER BY table_name, ordinal_position;"
 
         db = create_connection(connection_config)
-
+        
         records = []
         db.exec(query) do |result|
           result.each do |row|
@@ -50,7 +50,7 @@ module Multiwoven::Integrations::Source
 
       def create_connection(connection_config)
         raise "Unsupported Auth type" unless connection_config[:credentials][:auth_type] == "username/password"
-
+        
         PG.connect(
           host: connection_config[:host],
           dbname: connection_config[:database],
@@ -61,8 +61,8 @@ module Multiwoven::Integrations::Source
       end
 
       def create_streams(records)
-        group_by_table(records).map do |_r|
-          Multiwoven::Integrations::Protocol::Stream.new(name: table_name, action: StreamAction["fetch"], json_schema: convert_to_json_schema(columns))
+        group_by_table(records).map do |r|
+          Multiwoven::Integrations::Protocol::Stream.new(name: r[:tablename], action: StreamAction["fetch"], json_schema: convert_to_json_schema(r[:columns]))
         end
       end
 

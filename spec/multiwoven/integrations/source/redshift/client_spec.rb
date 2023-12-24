@@ -101,27 +101,28 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
   end
 
   describe "#discover" do
-    context "when reading records from a real Redshift database" do
-      it "reads records successfully" do
-        s_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json)
-        allow(PG).to receive(:connect).and_return(pg_connection)
+    it "discovers schema successfully" do
+      s_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json)
+      allow(PG).to receive(:connect).and_return(pg_connection)
+      discovery_query = "SELECT table_name, column_name, data_type, is_nullable\n" \
+                      "                 FROM information_schema.columns\n" \
+                      "                 WHERE table_schema = 'public' AND table_catalog = 'dev'\n" \
+                      "                 ORDER BY table_name, ordinal_position;"
+      allow(pg_connection).to receive(:exec).with(discovery_query).and_return(
+        [{ 'table_name' => "combined_users", 'column_name' => "city", 'data_type' => "varchar", 'is_nullable' => "YES" }]
+      )
+                      
+      allow(pg_connection).to receive(:close).and_return(true)
+      
+      streams = client.discover(sync_config[:source][:connection_specification])
+        
+      expect(streams).to be_an(Array)
 
-        allow(pg_connection).to receive(:exec).with(s_config.model.query).and_return(
-          [
-            Multiwoven::Integrations::Protocol::RecordMessage.new(
-              data: { column1: "column1" }, emitted_at: Time.now.to_i
-            ),
-            Multiwoven::Integrations::Protocol::RecordMessage.new(
-              data: { column2: "column2" }, emitted_at: Time.now.to_i
-            )
-          ]
-        )
-        allow(pg_connection).to receive(:close).and_return(true)
-        records = client.read(s_config)
-        expect(records).to be_an(Array)
-        expect(records).not_to be_empty
-        expect(records.first).to be_a(Multiwoven::Integrations::Protocol::RecordMessage)
-      end
+      first_stream = streams.first
+      expect(first_stream).to be_a(Multiwoven::Integrations::Protocol::Stream)
+      expect(first_stream.name).to eq("combined_users")
+      expect(first_stream.json_schema).to be_an(Hash)
+      expect(first_stream.json_schema["type"]).to eq("object")
     end
   end
 end
