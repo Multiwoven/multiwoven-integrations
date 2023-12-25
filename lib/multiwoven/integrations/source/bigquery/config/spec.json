@@ -4,69 +4,23 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "BigQuery Source Spec",
     "type": "object",
-    "required": ["host", "port", "database", "schema"],
+    "required": ["project_id", "credentials_json"],
     "properties": {
-      "credentials": {
-        "title": "Authorization Method",
-        "type": "object",
-        "oneOf": [
-          {
-            "title": "Username and Password",
-            "type": "object",
-            "required": ["username", "password", "auth_type"],
-            "order": 1,
-            "properties": {
-              "auth_type": {
-                "type": "string",
-                "const": "username/password",
-                "order": 0
-              },
-              "username": {
-                "description": "The username for Redshift database access.",
-                "examples": ["REDSHIFT_USER"],
-                "type": "string",
-                "title": "Username",
-                "order": 1
-              },
-              "password": {
-                "description": "The password for the Redshift user.",
-                "type": "string",
-                "multiwoven_secret": true,
-                "title": "Password",
-                "order": 2
-              }
-            }
-          }
-        ],
-        "order": 0
-      },
-      "host": {
-        "description": "The host endpoint of the Redshift cluster.",
-        "examples": ["example-redshift-cluster.abcdefg.us-west-2.redshift.amazonaws.com"],
+      "project_id": {
         "type": "string",
-        "title": "Host",
-        "order": 1
+        "description": "The GCP project ID for the project containing the target BigQuery dataset.",
+        "title": "Project ID"
       },
-      "port": {
-        "description": "The port on which Redshift is running (default is 5439).",
-        "examples": ["5439"],
+      "dataset_id": {
         "type": "string",
-        "title": "Port",
-        "order": 2
+        "description": "The dataset ID to search for tables and views. If you are only loading data from one dataset, setting this option could result in much faster schema discovery.",
+        "title": "Default Dataset ID"
       },
-      "database": {
-        "description": "The specific Redshift database to connect to.",
-        "examples": ["REDSHIFT_DB"],
+      "credentials_json": {
         "type": "string",
-        "title": "Database",
-        "order": 3
-      },
-      "schema": {
-        "description": "The schema within the Redshift database.",
-        "examples": ["REDSHIFT_SCHEMA"],
-        "type": "string",
-        "title": "Schema",
-        "order": 4
+        "description": "The contents of your Service Account Key JSON file. See the <a href=\"https://docs.multiwoven.com/integrations/sources/bigquery#setup-the-bigquery-source-in-airbyte\">docs</a> for more information on how to obtain this key.",
+        "title": "Credentials JSON",
+        "multiwoven_secret": true
       }
     }
   }
