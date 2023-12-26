@@ -15,11 +15,12 @@ module Multiwoven
     StreamType = Types::String.enum("static", "dynamic")
     StreamAction = Types::String.enum("fetch", "create", "update", "delete")
     MultiwovenMessageType = Types::String.enum(
-      "record", "log", "spec", "connection_status", "catalog"
+      "record", "log", "connector_spec", "connection_status", "catalog", "control"
     )
     ControlMessageType = Types::String.enum(
       "rate_limit", "connection_config"
     )
+    LogLevel = Types::String.enum("fatal", "error", "warn", "info", "debug", "trace")
 
     class ProtocolModel < Dry::Struct
       extend Multiwoven::Integrations::Core::Utils
@@ -34,6 +35,13 @@ module Multiwoven
     class ConnectionStatus < ProtocolModel
       attribute :status, ConnectionStatusType
       attribute? :message, Types::String.optional
+
+      def to_multiwoven_message
+        MultiwovenMessage.new(
+          type: MultiwovenMessageType["connection_status"],
+          connection_status: self
+        )
+      end
     end
 
     class ConnectorSpecification < ProtocolModel
@@ -44,6 +52,13 @@ module Multiwoven
       attribute :supports_dbt, Types::Bool.default(false)
       attribute :stream_type, StreamType
       attribute? :supported_destination_sync_modes, Types::Array.of(DestinationSyncMode).optional
+
+      def to_multiwoven_message
+        MultiwovenMessage.new(
+          type: MultiwovenMessageType["connector_spec"],
+          connector_spec: self
+        )
+      end
     end
 
     class Connector < ProtocolModel
@@ -53,10 +68,17 @@ module Multiwoven
     end
 
     class LogMessage < ProtocolModel
-      attribute :level, Types::String.enum("fatal", "error", "warn", "info", "debug", "trace")
+      attribute :level, LogLevel
       attribute :message, Types::String
       attribute? :name, Types::String.optional
       attribute? :stack_trace, Types::String.optional
+
+      def to_multiwoven_message
+        MultiwovenMessage.new(
+          type: MultiwovenMessageType["log"],
+          log: self
+        )
+      end
     end
 
     class Model < ProtocolModel
@@ -69,6 +91,13 @@ module Multiwoven
     class RecordMessage < ProtocolModel
       attribute :data, Types::Hash
       attribute :emitted_at, Types::Integer
+
+      def to_multiwoven_message
+        MultiwovenMessage.new(
+          type: MultiwovenMessageType["record"],
+          record: self
+        )
+      end
     end
 
     class Stream < ProtocolModel
@@ -89,6 +118,13 @@ module Multiwoven
 
     class Catalog < ProtocolModel
       attribute :streams, Types::Array.of(Stream)
+
+      def to_multiwoven_message
+        MultiwovenMessage.new(
+          type: MultiwovenMessageType["catalog"],
+          catalog: self
+        )
+      end
     end
 
     class SyncConfig < ProtocolModel
@@ -105,13 +141,20 @@ module Multiwoven
       attribute :type, ControlMessageType
       attribute :emitted_at, Types::Integer
       attribute? :meta, Types::Hash
+
+      def to_multiwoven_message
+        MultiwovenMessage.new(
+          type: MultiwovenMessageType["control"],
+          control: self
+        )
+      end
     end
 
     class MultiwovenMessage < ProtocolModel
       attribute :type, MultiwovenMessageType
       attribute? :log, LogMessage.optional
       attribute? :connection_status, ConnectionStatus.optional
-      attribute? :spec, ConnectorSpecification.optional
+      attribute? :connector_spec, ConnectorSpecification.optional
       attribute? :catalog, Catalog.optional
       attribute? :record, RecordMessage.optional
       attribute? :control, ControlMessage.optional
