@@ -26,10 +26,12 @@ RSpec.describe Multiwoven::Integrations::Service do
     end
 
     it "returns connectors with source and destination arrays" do
-      expect(service.connectors).to eq({
-        source: ["source_meta"],
-        destination: ["destination_meta"]
-      })
+      expect(service.connectors).to eq(
+        {
+          source: ["source_meta"],
+          destination: ["destination_meta"]
+        }
+      )
     end
   end
 end
