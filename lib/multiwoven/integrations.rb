@@ -10,6 +10,8 @@ require "byebug"
 require "net/http"
 require "uri"
 require "active_support/core_ext/hash/indifferent_access"
+require "restforce"
+require "logger"
 
 # Service
 require_relative "integrations/config"
