@@ -36,7 +36,9 @@ RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do # ruboc
       end
 
       it "returns a successful connection status" do
-        result = subject.check_connection(connection_config)
+        message = subject.check_connection(connection_config)
+        result = message.connection_status
+
         expect(result.status).to eq(Multiwoven::Integrations::Protocol::ConnectionStatusType["succeeded"])
       end
     end
@@ -52,7 +54,9 @@ RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do # ruboc
       end
 
       it "returns a failed connection status with an error message" do
-        result = subject.check_connection(connection_config)
+        message = subject.check_connection(connection_config)
+        result = message.connection_status
+
         expect(result.status).to eq(Multiwoven::Integrations::Protocol::ConnectionStatusType["failed"])
         expect(result.message).to eq(error_message)
       end
@@ -67,7 +71,9 @@ RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do # ruboc
       end
 
       it "returns a failed connection status with a default error message" do
-        result = subject.check_connection(connection_config)
+        message = subject.check_connection(connection_config)
+        result = message.connection_status
+
         expect(result.status).to eq(Multiwoven::Integrations::Protocol::ConnectionStatusType["failed"])
         expect(result.message).to include("Klaviyo auth failed")
       end

@@ -6,9 +6,9 @@ module Multiwoven::Integrations::Source
     class Client < SourceConnector
       def check_connection(connection_config)
         create_connection(connection_config)
-        ConnectionStatus.new(status: ConnectionStatusType["succeeded"])
+        ConnectionStatus.new(status: ConnectionStatusType["succeeded"]).to_multiwoven_message
       rescue Sequel::DatabaseConnectionError => e
-        ConnectionStatus.new(status: ConnectionStatusType["failed"], message: e.message)
+        ConnectionStatus.new(status: ConnectionStatusType["failed"], message: e.message).to_multiwoven_message
       end
 
       def discover(connection_config)
@@ -23,7 +23,8 @@ module Multiwoven::Integrations::Source
         db.fetch(query.gsub("\n", "")) do |row|
           records << row
         end
-        create_streams(records)
+        catalog = Catalog.new(streams: create_streams(records))
+        catalog.to_multiwoven_message
       end
 
       def read(sync_config)
@@ -33,7 +34,7 @@ module Multiwoven::Integrations::Source
 
         records = []
         db.fetch(query) do |row|
-          records << RecordMessage.new(data: row, emitted_at: Time.now.to_i)
+          records << RecordMessage.new(data: row, emitted_at: Time.now.to_i).to_multiwoven_message
         end
 
         records

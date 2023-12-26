@@ -57,7 +57,9 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
       it "returns a succeeded connection status" do
         allow(Sequel).to receive(:postgres).and_return(true)
         allow(PG).to receive(:connect).and_return(pg_connection)
-        result = client.check_connection(sync_config[:source][:connection_specification])
+        message = client.check_connection(sync_config[:source][:connection_specification])
+        result = message.connection_status
+
         expect(result.status).to eq("succeeded")
         expect(result.message).to be_nil
       end
@@ -67,7 +69,8 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
       it "returns a failed connection status with an error message" do
         allow(PG).to receive(:connect).and_raise(PG::Error.new("Connection failed"))
 
-        result = client.check_connection(sync_config[:source][:connection_specification])
+        message = client.check_connection(sync_config[:source][:connection_specification])
+        result = message.connection_status
         expect(result.status).to eq("failed")
         expect(result.message).to include("Connection failed")
       end
@@ -85,17 +88,17 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
           [
             Multiwoven::Integrations::Protocol::RecordMessage.new(
               data: { column1: "column1" }, emitted_at: Time.now.to_i
-            ),
+            ).to_multiwoven_message,
             Multiwoven::Integrations::Protocol::RecordMessage.new(
               data: { column2: "column2" }, emitted_at: Time.now.to_i
-            )
+            ).to_multiwoven_message
           ]
         )
         allow(pg_connection).to receive(:close).and_return(true)
         records = client.read(s_config)
         expect(records).to be_an(Array)
         expect(records).not_to be_empty
-        expect(records.first).to be_a(Multiwoven::Integrations::Protocol::RecordMessage)
+        expect(records.first).to be_a(Multiwoven::Integrations::Protocol::MultiwovenMessage)
       end
     end
   end
@@ -115,10 +118,10 @@ RSpec.describe Multiwoven::Integrations::Source::Redshift::Client do
         ]
       )
       allow(pg_connection).to receive(:close).and_return(true)
-      streams = client.discover(sync_config[:source][:connection_specification])
+      message = client.discover(sync_config[:source][:connection_specification])
 
-      expect(streams).to be_an(Array)
-      first_stream = streams.first
+      expect(message.catalog).to be_an(Multiwoven::Integrations::Protocol::Catalog)
+      first_stream = message.catalog.streams.first
       expect(first_stream).to be_a(Multiwoven::Integrations::Protocol::Stream)
       expect(first_stream.name).to eq("combined_users")
       expect(first_stream.json_schema).to be_an(Hash)

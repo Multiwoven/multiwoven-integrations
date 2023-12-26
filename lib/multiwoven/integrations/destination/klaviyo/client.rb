@@ -17,9 +17,9 @@ module Multiwoven::Integrations::Destination
       end
 
       def discover
-        catalog = read_json(CATALOG_SPEC_PATH)
+        catalog_json = read_json(CATALOG_SPEC_PATH)
 
-        catalog["streams"].map do |stream|
+        streams = catalog_json["streams"].map do |stream|
           Multiwoven::Integrations::Protocol::Stream.new(
             name: stream["name"],
             json_schema: stream["json_schema"],
@@ -28,6 +28,12 @@ module Multiwoven::Integrations::Destination
             action: stream["action"]
           )
         end
+
+        catalog = Multiwoven::Integrations::Protocol::Catalog.new(
+          streams: streams
+        )
+
+        catalog.to_multiwoven_message
       end
 
       def write(sync_config, records, _action = "insert")
@@ -67,10 +73,14 @@ module Multiwoven::Integrations::Destination
 
       def parse_response(response)
         if success?(response)
-          ConnectionStatus.new(status: ConnectionStatusType["succeeded"])
+          ConnectionStatus.new(
+            status: ConnectionStatusType["succeeded"]
+          ).to_multiwoven_message
         else
           message = extract_message(response)
-          ConnectionStatus.new(status: ConnectionStatusType["failed"], message: message)
+          ConnectionStatus.new(
+            status: ConnectionStatusType["failed"], message: message
+          ).to_multiwoven_message
         end
       end
 
