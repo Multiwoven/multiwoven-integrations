@@ -183,5 +183,44 @@ module Multiwoven
         end
       end
     end
+
+    RSpec.describe Multiwoven::Integrations::Protocol::ControlMessage do
+      describe ".from_json" do
+        let(:json_data) do
+          {
+            "type": "rate_limit",
+            "emitted_at": 1_638_449_455_000,
+            "meta": { "key": "value" }
+          }.to_json
+        end
+
+        it "creates an instance from JSON" do
+          control_message = described_class.from_json(json_data)
+
+          expect(control_message).to be_a(described_class)
+          expect(control_message.type).to eq("rate_limit")
+          expect(control_message.emitted_at).to eq(1_638_449_455_000)
+          expect(control_message.meta).to eq(key: "value")
+        end
+      end
+    end
+
+    RSpec.describe Multiwoven::Integrations::Protocol::MultiwovenMessage do
+      describe ".from_json" do
+        let(:json_data) do
+          {
+            "type": "log",
+            "log": { "level": "info", "message": "Sample log message" }
+          }.to_json
+        end
+
+        it "creates an instance from JSON" do
+          multiwoven_message = described_class.from_json(json_data)
+
+          expect(multiwoven_message).to be_a(described_class)
+          expect(multiwoven_message.type).to eq("log")
+        end
+      end
+    end
   end
 end

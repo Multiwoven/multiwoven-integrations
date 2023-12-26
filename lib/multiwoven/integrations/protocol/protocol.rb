@@ -14,6 +14,13 @@ module Multiwoven
     ConnectionStatusType = Types::String.enum("succeeded", "failed")
     StreamType = Types::String.enum("static", "dynamic")
     StreamAction = Types::String.enum("fetch", "create", "update", "delete")
+    MultiwovenMessageType = Types::String.enum(
+      "record", "log", "spec", "connection_status", "catalog"
+    )
+    ControlMessageType = Types::String.enum(
+      "rate_limit", "connection_config"
+    )
+
     class ProtocolModel < Dry::Struct
       extend Multiwoven::Integrations::Core::Utils
       class << self
@@ -48,6 +55,7 @@ module Multiwoven
     class LogMessage < ProtocolModel
       attribute :level, Types::String.enum("fatal", "error", "warn", "info", "debug", "trace")
       attribute :message, Types::String
+      attribute? :name, Types::String.optional
       attribute? :stack_trace, Types::String.optional
     end
 
@@ -91,6 +99,22 @@ module Multiwoven
       attribute :sync_mode, SyncMode
       attribute? :cursor_field, Types::String.optional
       attribute :destination_sync_mode, DestinationSyncMode
+    end
+
+    class ControlMessage < ProtocolModel
+      attribute :type, ControlMessageType
+      attribute :emitted_at, Types::Integer
+      attribute? :meta, Types::Hash
+    end
+
+    class MultiwovenMessage < ProtocolModel
+      attribute :type, MultiwovenMessageType
+      attribute? :log, LogMessage.optional
+      attribute? :connection_status, ConnectionStatus.optional
+      attribute? :spec, ConnectorSpecification.optional
+      attribute? :catalog, Catalog.optional
+      attribute? :record, RecordMessage.optional
+      attribute? :control, ControlMessage.optional
     end
   end
 end
