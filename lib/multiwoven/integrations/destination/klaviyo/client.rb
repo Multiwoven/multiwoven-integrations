@@ -41,12 +41,8 @@ module Multiwoven::Integrations::Destination
         url = sync_config.stream.url
         request_method = sync_config.stream.request_method
 
-        # TODO: Standerdise this across connectors
-        tracker = {
-          success: 0,
-          failed: 0
-        }
-
+        write_success = 0
+        write_failure = 0
         records.each do |record|
           begin # rubocop:disable Style/RedundantBegin
             response = Multiwoven::Integrations::Core::HttpClient.request(
@@ -56,17 +52,21 @@ module Multiwoven::Integrations::Destination
               headers: auth_headers(connection_config["private_api_key"])
             )
             if success?(response)
-              tracker[:success] += 1
+              write_success += 1
             else
-              tracker[:failed] += 1
+              write_failure += 1
             end
           rescue StandardError
             # TODO: Handle ratelimiting
             # TODO: Log error message
-            tracker[:failed] += 1
+            write_failure += 1
           end
         end
-        tracker
+        tracker = Multiwoven::Integrations::Protocol::TrackingMessage.new(
+          success: write_success,
+          failed: write_failure
+        )
+        tracker.to_multiwoven_message
       end
 
       private

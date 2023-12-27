@@ -133,10 +133,11 @@ RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do # ruboc
 
         stub_request(:any, sync_config.stream.url)
           .to_return(status: 200, body: '{"message": "Success"}')
-        tracker = subject.write(sync_config, records)
+        message = subject.write(sync_config, records)
+        tracker = message.tracking
 
-        expect(tracker[:success]).to eq(records.count)
-        expect(tracker[:failed]).to eq(0)
+        expect(tracker.success).to eq(records.count)
+        expect(tracker.failed).to eq(0)
       end
     end
 
@@ -148,10 +149,10 @@ RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do # ruboc
         stub_request(:any, sync_config.stream.url)
           .to_return(status: 500, body: '{"message": "Error"}')
 
-        tracker = subject.write(sync_config, records)
-
-        expect(tracker[:failed]).to eq(records.count)
-        expect(tracker[:success]).to eq(0)
+        message = subject.write(sync_config, records)
+        tracker = message.tracking
+        expect(tracker.failed).to eq(records.count)
+        expect(tracker.success).to eq(0)
       end
     end
   end
