@@ -311,4 +311,20 @@ module Multiwoven
       end
     end
   end
+
+  RSpec.describe Multiwoven::Integrations::Protocol::TrackingMessage do
+    describe "#to_multiwoven_message" do
+      let(:tracking_message) do
+        Multiwoven::Integrations::Protocol::TrackingMessage.new(success: 3, failed: 1)
+      end
+
+      it "converts to a MultiwovenMessage" do
+        multiwoven_message = tracking_message.to_multiwoven_message
+
+        expect(multiwoven_message).to be_a(Multiwoven::Integrations::Protocol::MultiwovenMessage)
+        expect(multiwoven_message.type).to eq("tracking")
+        expect(multiwoven_message.tracking).to eq(tracking_message)
+      end
+    end
+  end
 end

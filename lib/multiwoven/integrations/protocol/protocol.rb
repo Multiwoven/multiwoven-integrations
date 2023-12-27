@@ -15,7 +15,9 @@ module Multiwoven
     StreamType = Types::String.enum("static", "dynamic")
     StreamAction = Types::String.enum("fetch", "create", "update", "delete")
     MultiwovenMessageType = Types::String.enum(
-      "record", "log", "connector_spec", "connection_status", "catalog", "control"
+      "record", "log", "connector_spec",
+      "connection_status", "catalog", "control",
+      "tracking"
     )
     ControlMessageType = Types::String.enum(
       "rate_limit", "connection_config"
@@ -150,6 +152,19 @@ module Multiwoven
       end
     end
 
+    class TrackingMessage < ProtocolModel
+      attribute :success, Types::Integer.default(0)
+      attribute :failed, Types::Integer.default(0)
+      attribute? :meta, Types::Hash
+
+      def to_multiwoven_message
+        MultiwovenMessage.new(
+          type: MultiwovenMessageType["tracking"],
+          tracking: self
+        )
+      end
+    end
+
     class MultiwovenMessage < ProtocolModel
       attribute :type, MultiwovenMessageType
       attribute? :log, LogMessage.optional
@@ -158,6 +173,7 @@ module Multiwoven
       attribute? :catalog, Catalog.optional
       attribute? :record, RecordMessage.optional
       attribute? :control, ControlMessage.optional
+      attribute? :tracking, TrackingMessage.optional
     end
   end
 end
