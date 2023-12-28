@@ -93,4 +93,21 @@ RSpec.describe Multiwoven::Integrations::Source::Bigquery::Client do
       expect(first_stream.json_schema["properties"]).to eq({ "FullName" => { "type" => "string" } })
     end
   end
+
+  describe "#read" do
+    it "reads records successfully" do
+      s_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json)
+      allow(Google::Cloud::Bigquery).to receive(:new).and_return(bigquery_instance)
+      result_row1 = { "full_name" => "John Kennedy", "customer_code" => 1 }
+      result_row2 = { "full_name" => "Jhon Doe", "customer_code" => 2 }
+      allow(bigquery_instance).to receive(:query).and_return([result_row1, result_row2])
+      records = client.read(s_config)
+      expect(records).to be_an(Array)
+      expect(records).not_to be_empty
+      expect(records.first).to be_a(Multiwoven::Integrations::Protocol::RecordMessage)
+      expect(records.first.data).to eq(result_row1)
+      expect(records[1]).to be_a(Multiwoven::Integrations::Protocol::RecordMessage)
+      expect(records[1].data).to eq(result_row2)
+    end
+  end
 end
