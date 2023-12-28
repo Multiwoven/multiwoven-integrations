@@ -23,7 +23,7 @@ gem "sequel"
 
 gem "pg"
 
-gem "ruby-odbc", github: "subintp/ruby-odbc"
+gem "ruby-odbc", git: "https://github.com/subintp/ruby-odbc.git"
 
 gem "webmock", "~> 3.0"
 
