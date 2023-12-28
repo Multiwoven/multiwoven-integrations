@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+# frozen_string_literal: true # rubocop:disable Naming/FileName
 
 require "json"
 require "dry-struct"
