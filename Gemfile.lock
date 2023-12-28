@@ -8,6 +8,14 @@ PATH
   remote: .
   specs:
     multiwoven-integrations (0.1.0)
+      activesupport
+      dry-schema
+      dry-struct
+      dry-types
+      pg
+      rake
+      ruby-odbc
+      sequel
 
 GEM
   remote: https://rubygems.org/
