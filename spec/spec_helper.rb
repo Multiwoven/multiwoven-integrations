@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "multiwoven/multiwoven-integrations"
+require "multiwoven/integrations"
 require "webmock/rspec"
 
 require "simplecov"
