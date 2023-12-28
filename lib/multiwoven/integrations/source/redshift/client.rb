@@ -31,6 +31,12 @@ module Multiwoven::Integrations::Source
         end
         catalog = Catalog.new(streams: create_streams(records))
         catalog.to_multiwoven_message
+      rescue StandardError => e
+        handle_exception(
+          "REDSHIFT:DISCOVER:EXCEPTION",
+          "error",
+          e
+        )
       ensure
         db&.close
       end
@@ -45,6 +51,12 @@ module Multiwoven::Integrations::Source
           end
         end
         records
+      rescue StandardError => e
+        handle_exception(
+          "REDSHIFT:READ:EXCEPTION",
+          "error",
+          e
+        )
       ensure
         db&.close
       end

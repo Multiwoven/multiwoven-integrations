@@ -34,39 +34,51 @@ module Multiwoven::Integrations::Destination
         )
 
         catalog.to_multiwoven_message
+      rescue StandardError => e
+        handle_exception(
+          "KLAVIYO:DISCOVER:EXCEPTION",
+          "error",
+          e
+        )
       end
 
       def write(sync_config, records, _action = "insert")
-        connection_config = sync_config.destination.connection_specification
+        connection_config = sync_config.destination.connection_specification.with_indifferent_access
         url = sync_config.stream.url
         request_method = sync_config.stream.request_method
 
         write_success = 0
         write_failure = 0
         records.each do |record|
-          begin # rubocop:disable Style/RedundantBegin
-            response = Multiwoven::Integrations::Core::HttpClient.request(
-              url,
-              request_method,
-              payload: record,
-              headers: auth_headers(connection_config["private_api_key"])
-            )
-            if success?(response)
-              write_success += 1
-            else
-              write_failure += 1
-            end
-          rescue StandardError
-            # TODO: Handle ratelimiting
-            # TODO: Log error message
+          response = Multiwoven::Integrations::Core::HttpClient.request(
+            url,
+            request_method,
+            payload: record,
+            headers: auth_headers(connection_config["private_api_key"])
+          )
+          if success?(response)
+            write_success += 1
+          else
             write_failure += 1
           end
+        rescue StandardError => e
+          logger.error(
+            "KLAVIYO:RECORD:WRITE:FAILURE: #{e.message}"
+          )
+          write_failure += 1
         end
         tracker = Multiwoven::Integrations::Protocol::TrackingMessage.new(
           success: write_success,
           failed: write_failure
         )
         tracker.to_multiwoven_message
+      rescue StandardError => e
+        # TODO: Handle rate limiting seperately
+        handle_exception(
+          "KLAVIYO:WRITE:EXCEPTION",
+          "error",
+          e
+        )
       end
 
       private

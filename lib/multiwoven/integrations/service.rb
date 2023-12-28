@@ -19,6 +19,14 @@ module Multiwoven
           Object.const_get("Multiwoven::Integrations::#{connector_type}::#{connector_name}::Client")
         end
 
+        def logger
+          config.logger || default_logger
+        end
+
+        def config
+          @config ||= Config.new
+        end
+
         private
 
         def build_connectors(enabled_connectors, type)
@@ -29,8 +37,8 @@ module Multiwoven
           end
         end
 
-        def config
-          @config ||= Config.new
+        def default_logger
+          @default_logger ||= Logger.new($stdout)
         end
       end
     end

@@ -25,6 +25,12 @@ module Multiwoven::Integrations::Source
         end
         catalog = Catalog.new(streams: create_streams(records))
         catalog.to_multiwoven_message
+      rescue StandardError => e
+        handle_exception(
+          "SNOWFLAKE:DISCOVER:EXCEPTION",
+          "error",
+          e
+        )
       end
 
       def read(sync_config)
@@ -38,6 +44,12 @@ module Multiwoven::Integrations::Source
         end
 
         records
+      rescue StandardError => e
+        handle_exception(
+          "SNOWFLAKE:READ:EXCEPTION",
+          "error",
+          e
+        )
       end
 
       private
