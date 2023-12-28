@@ -14,7 +14,7 @@ PATH
       dry-types
       pg
       rake
-      ruby-odbc
+      ruby-odbc (~> 0.999992)
       sequel
 
 GEM

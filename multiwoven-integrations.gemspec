@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "dry-types"
   spec.add_runtime_dependency "pg"
   spec.add_runtime_dependency "rake"
-  spec.add_runtime_dependency "ruby-odbc"
+  spec.add_runtime_dependency "ruby-odbc", "~> 0.999992"
   spec.add_runtime_dependency "sequel"
 
   spec.add_development_dependency "byebug"
