@@ -18,7 +18,7 @@
       },
       "credentials_json": {
         "type": "string",
-        "description": "The contents of your Service Account Key JSON file. See the <a href=\"https://docs.multiwoven.com/integrations/sources/bigquery#setup-the-bigquery-source-in-airbyte\">docs</a> for more information on how to obtain this key.",
+        "description": "The contents of your Service Account Key JSON file. See the <a href=\"https://docs.multiwoven.com/integrations/sources/bigquery#setup-the-bigquery-source-in-multiwoven\">docs</a> for more information on how to obtain this key.",
         "title": "Credentials JSON",
         "multiwoven_secret": true
       }
