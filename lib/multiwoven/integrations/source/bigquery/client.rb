@@ -9,9 +9,9 @@ module Multiwoven::Integrations::Source
       def check_connection(connection_config)
         bigquery = create_connection(connection_config)
         bigquery.datasets
-        ConnectionStatus.new(status: ConnectionStatusType["succeeded"])
+        ConnectionStatus.new(status: ConnectionStatusType["succeeded"]).to_multiwoven_message
       rescue StandardError => e
-        ConnectionStatus.new(status: ConnectionStatusType["failed"], message: e.message)
+        ConnectionStatus.new(status: ConnectionStatusType["failed"], message: e.message).to_multiwoven_message
       end
 
       def discover(connection_config)
@@ -31,7 +31,14 @@ module Multiwoven::Integrations::Source
             end
           end
         end
-        create_streams(records)
+        catalog = Catalog.new(streams: create_streams(records))
+        catalog.to_multiwoven_message
+      rescue StandardError => e
+        handle_exception(
+          "BIGQUERY:DISCOVER:EXCEPTION",
+          "error",
+          e
+        )
       end
 
       def read(sync_config)
@@ -45,6 +52,12 @@ module Multiwoven::Integrations::Source
         end
 
         records
+      rescue StandardError => e
+        handle_exception(
+          "BIGQUERY:READ:EXCEPTION",
+          "error",
+          e
+        )
       end
 
       def create_connection(connection_config)

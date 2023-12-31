@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Multiwoven::Integrations::Source::Bigquery::Client do
+RSpec.describe Multiwoven::Integrations::Source::Bigquery::Client do # rubocop:disable Metrics/BlockLength
   let(:client) { Multiwoven::Integrations::Source::Bigquery::Client.new }
   let(:sync_config) do
     {
@@ -53,7 +53,8 @@ RSpec.describe Multiwoven::Integrations::Source::Bigquery::Client do
       it "returns a succeeded connection status" do
         allow(Google::Cloud::Bigquery).to receive(:new).and_return(bigquery_instance)
         allow(bigquery_instance).to receive(:datasets).and_return([])
-        result = client.check_connection(sync_config[:source][:connection_specification].with_indifferent_access)
+        message = client.check_connection(sync_config[:source][:connection_specification].with_indifferent_access)
+        result = message.connection_status
         expect(result.status).to eq("succeeded")
         expect(result.message).to be_nil
       end
@@ -62,7 +63,8 @@ RSpec.describe Multiwoven::Integrations::Source::Bigquery::Client do
     context "when the connection fails" do
       it "returns a failed connection status with an error message" do
         allow(Google::Cloud::Bigquery).to receive(:new).and_raise(PG::Error.new("Connection failed"))
-        result = client.check_connection(sync_config[:source][:connection_specification].with_indifferent_access)
+        message = client.check_connection(sync_config[:source][:connection_specification].with_indifferent_access)
+        result = message.connection_status
         expect(result.status).to eq("failed")
         expect(result.message).to include("Connection failed")
       end
@@ -82,15 +84,26 @@ RSpec.describe Multiwoven::Integrations::Source::Bigquery::Client do
       allow(bigquery_field).to receive(:type).and_return("string")
       allow(bigquery_field).to receive(:mode).and_return("NULLABLE")
 
-      streams = client.discover(sync_config[:source][:connection_specification].with_indifferent_access)
+      message = client.discover(sync_config[:source][:connection_specification].with_indifferent_access)
+      expect(message.catalog).to be_an(Multiwoven::Integrations::Protocol::Catalog)
 
-      expect(streams).to be_an(Array)
-      first_stream = streams.first
+      expect(message.catalog.streams).to be_an(Array)
+      first_stream = message.catalog.streams.first
       expect(first_stream).to be_a(Multiwoven::Integrations::Protocol::Stream)
       expect(first_stream.name).to eq("customer")
       expect(first_stream.json_schema).to be_an(Hash)
       expect(first_stream.json_schema["type"]).to eq("object")
       expect(first_stream.json_schema["properties"]).to eq({ "FullName" => { "type" => "string" } })
+    end
+
+    it "discover schema failure" do
+      allow(client).to receive(:create_connection).and_raise(StandardError.new("test error"))
+      expect(client).to receive(:handle_exception).with(
+        "BIGQUERY:DISCOVER:EXCEPTION",
+        "error",
+        an_instance_of(StandardError)
+      )
+      client.discover(sync_config[:source][:connection_specification])
     end
   end
 
@@ -108,6 +121,17 @@ RSpec.describe Multiwoven::Integrations::Source::Bigquery::Client do
       expect(records.first.data).to eq(result_row1)
       expect(records[1]).to be_a(Multiwoven::Integrations::Protocol::RecordMessage)
       expect(records[1].data).to eq(result_row2)
+    end
+
+    it "read records failure" do
+      s_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json)
+      allow(client).to receive(:create_connection).and_raise(StandardError.new("test error"))
+      expect(client).to receive(:handle_exception).with(
+        "BIGQUERY:READ:EXCEPTION",
+        "error",
+        an_instance_of(StandardError)
+      )
+      client.read(s_config)
     end
   end
 end
