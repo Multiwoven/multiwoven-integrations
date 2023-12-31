@@ -12,6 +12,7 @@ PATH
       dry-schema
       dry-struct
       dry-types
+      google-cloud-bigquery
       pg
       rake
       ruby-odbc (~> 0.999992)
