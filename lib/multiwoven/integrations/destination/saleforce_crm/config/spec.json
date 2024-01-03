@@ -20,17 +20,17 @@
         "instance_url": {
           "type": "string",
           "title": "Instance URL",
-          "order": 0
+          "order": 2
         },
         "client_id": {
           "type": "string",
           "title": "Client ID",
-          "order": 1
+          "order": 3
         },
         "client_secret": {
           "type": "string",
           "title": "Client Secret",
-          "order": 1
+          "order": 4
         }
       }
     }
