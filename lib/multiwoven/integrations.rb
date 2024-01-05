@@ -34,6 +34,7 @@ require_relative "integrations/source/bigquery/client"
 
 # Destination
 require_relative "integrations/destination/klaviyo/client"
+require_relative "integrations/destination/salesforce_crm/client"
 
 module Multiwoven
   module Integrations

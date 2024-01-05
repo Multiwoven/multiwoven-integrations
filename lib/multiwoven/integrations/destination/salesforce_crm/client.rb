@@ -103,6 +103,7 @@ module Multiwoven
           end
 
           def load_catalog_streams
+            byebug
             catalog_json = read_json(CATALOG_SPEC_PATH)
             catalog_json['streams'].map { |stream| build_stream(stream) }
           end
