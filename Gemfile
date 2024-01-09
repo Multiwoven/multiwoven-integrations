@@ -28,7 +28,8 @@ gem "ruby-odbc", git: "https://github.com/Multiwoven/ruby-odbc.git"
 gem "webmock", "~> 3.0"
 
 gem "activesupport"
-
+gem "facebook_ads"
+gem "facebookbusiness"
 gem "google-cloud-bigquery"
 gem "restforce", "~> 7.1.0"
 
