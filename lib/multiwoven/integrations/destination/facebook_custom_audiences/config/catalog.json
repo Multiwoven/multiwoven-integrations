@@ -4,6 +4,7 @@
       "name": "audience",
       "action": "create",
       "method": "POST",
+      "url": "https://graph.facebook.com/v18.0/120203392923630274/users",
       "json_schema": {
         "type": "object",
         "additionalProperties": true,
@@ -12,84 +13,46 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["CT", "COUNTRY", "DOBD","DOBM","DOBY","EMAIL","EXTERN_ID","FI","FN","GEN","LN","LOOKALIKE_VALUE","MADID","PAGEUID","PHONE","ST","ZIP"]
+              "enum": [
+                { "value": "CT", "type": "string" },
+                { "value": "COUNTRY", "type": "string" },
+                { "value": "DOBD", "type": "string" },
+                { "value": "DOBM", "type": "string" },
+                { "value": "DOBY", "type": "string" },
+                { "value": "EMAIL", "type": "string" },
+                { "value": "EXTERN_ID", "type": "string" },
+                { "value": "FI", "type": "string" },
+                { "value": "FN", "type": "string" },
+                { "value": "GEN", "type": "string" },
+                { "value": "LN", "type": "string" },
+                { "value": "LOOKALIKE_VALUE", "type": "number" },
+                { "value": "MADID", "type": "string" },
+                { "value": "PAGEUID", "type": "string" },
+                { "value": "PHONE", "type": "string" },
+                { "value": "ST", "type": "string" },
+                { "value": "ZIP", "type": "string" }
+              ]
             }
           },
           "data": {
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "CT": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "COUNTRY": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "DOBD": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "DOBM": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "DOBY": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "EMAIL": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "EXTERN_ID": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "FI": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "FN": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "GEN": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "LN": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "LOOKALIKE_VALUE": {
-                  "type": ["number", "null"],
-                  "default": null
-                },
-                "MADID": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "PAGEUID": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "PHONE": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "ST": {
-                  "type": ["string", "null"],
-                  "default": null
-                },
-                "ZIP": {
-                  "type": ["string", "null"],
-                  "default": null
-                }
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/field"
               }
             }
+          },
+          "definitions": {
+            "field": {
+              "oneOf": [
+                { "$ref": "#/definitions/stringField" },
+                { "$ref": "#/definitions/numberField" },
+                { "type": "null" }
+              ]
+            },
+            "stringField": { "type": "string" },
+            "numberField": { "type": "number" }
           }
         }
       },
