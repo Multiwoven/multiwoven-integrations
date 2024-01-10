@@ -28,7 +28,6 @@ module Multiwoven::Integrations::Destination
           Multiwoven::Integrations::Protocol::Stream.new(
             name: stream["name"],
             json_schema: stream["json_schema"],
-            url: stream["url"],
             method: stream["method"],
             action: stream["action"]
           )
@@ -59,10 +58,6 @@ module Multiwoven::Integrations::Destination
         return if extract_data(response).any? { |ad_account| ad_account["id"] == formatted_ad_account_id(ad_account_id) }
 
         raise ArgumentError, "Ad account not found in business account"
-      end
-
-      def success?(response)
-        response && %w[200 201].include?(response.code.to_s)
       end
 
       def extract_data(response)
