@@ -15,6 +15,7 @@ PATH
       google-cloud-bigquery
       pg
       rake
+      restforce
       ruby-odbc
       sequel
 
