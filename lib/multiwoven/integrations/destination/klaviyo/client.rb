@@ -55,8 +55,8 @@ module Multiwoven::Integrations::Destination
         records.each do |record|
           # pre process payload
           # Add hardcode values into payload
-          record[:data] ||= {}
-          record[:data][:type] = sync_config.stream.name
+          record["data"] ||= {}
+          record["data"]["type"] = sync_config.stream.name
 
           response = Multiwoven::Integrations::Core::HttpClient.request(
             url,

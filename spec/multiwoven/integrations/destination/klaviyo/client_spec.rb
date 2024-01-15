@@ -159,16 +159,16 @@ RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do # ruboc
       it "sends the correct payload to klaviyo" do
         expected_payload =
           {
-            data: {
-              type: sync_config.stream.name
+            "data" => {
+              "type" => sync_config.stream.name
             },
-            id: 1,
-            name: "Sample Record 1"
+            "id" => 1,
+            "name" => "Sample Record 1"
           }
 
         stub_request(:any, sync_config.stream.url)
           .to_return(status: 200, body: '{"message": "Success"}')
-        subject.write(sync_config, [records.first.data])
+        subject.write(sync_config, [records.first.data.transform_keys(&:to_s)])
 
         expect(Multiwoven::Integrations::Core::HttpClient).to have_received(:request).with(
           sync_config.stream.url,
@@ -181,7 +181,10 @@ RSpec.describe Multiwoven::Integrations::Destination::Klaviyo::Client do # ruboc
       it "increments the success count" do
         stub_request(:any, sync_config.stream.url)
           .to_return(status: 200, body: '{"message": "Success"}')
-        message = subject.write(sync_config, records)
+        message = subject.write(sync_config, [
+                                  records.first.data.transform_keys(&:to_s),
+                                  records.first.data.transform_keys(&:to_s)
+                                ])
         tracker = message.tracking
 
         expect(tracker.success).to eq(records.count)
