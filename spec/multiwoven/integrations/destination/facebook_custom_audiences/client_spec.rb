@@ -78,7 +78,7 @@ RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudiences::C
       message = client.check_connection(connection_config)
       result = message.connection_status
       expect(result.status).to eq(Multiwoven::Integrations::Protocol::ConnectionStatusType["failed"])
-      expect(result.message).to eq( "Ad account not found in business account")
+      expect(result.message).to eq("Ad account not found in business account")
     end
 
     it "returns a failed connection status if the request is not successful" do
