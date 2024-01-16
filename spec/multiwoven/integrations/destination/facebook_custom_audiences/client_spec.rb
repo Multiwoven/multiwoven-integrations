@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudiences::Client do
-
   include WebMock::API
 
   before(:each) do
@@ -18,21 +17,40 @@ RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudiences::C
     catalog.streams.find { |stream| stream.name == "audience" }.json_schema
   end
 
-  let(:sync_config) do
+  let(:sync_config_json) do
     {
-      destination: {
-        name: "Facebook Custom Audience",
-        type: "destination",
-        connection_specification: connection_config
+      "source": {
+        "name": "SourceConnectorName",
+        "type": "source",
+        "connection_specification": {
+          "private_api_key": "test_api_key"
+        }
       },
-      stream: {
-        name: "audience",
-        action: "create",
-        json_schema: facebook_audience_json_schema
+      "destination": {
+        "name": "Facebook Custom Audience",
+        "type": "destination",
+        "connection_specification": connection_config
       },
-      sync_mode: "full_refresh",
-      cursor_field: "timestamp",
-      destination_sync_mode: "append"
+      "model": {
+        "name": "ExampleModel",
+        "query": "SELECT * FROM CALL_CENTER LIMIT 1",
+        "query_type": "raw_sql",
+        "primary_key": "id"
+      },
+      "stream": {
+        "name": "audience", "action": "create",
+        "json_schema": facebook_audience_json_schema,
+        "supported_sync_modes": %w[full_refresh incremental],
+        "source_defined_cursor": true,
+        "default_cursor_field": ["field1"],
+        "source_defined_primary_key": [["field1"], ["field2"]],
+        "namespace": "exampleNamespace",
+        "url": "https://api.example.com/data",
+        "request_method": "POST"
+      },
+      "sync_mode": "full_refresh",
+      "cursor_field": "timestamp",
+      "destination_sync_mode": "upsert"
     }.with_indifferent_access
   end
 
@@ -78,6 +96,26 @@ RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudiences::C
       expect(catalog).to be_a(Multiwoven::Integrations::Protocol::Catalog)
       expect(catalog.streams.first.name).to eq("audience")
       expect(catalog.streams.first.request_method).to eql("POST")
+    end
+  end
+
+  describe "#write" do
+    let(:success_response) { instance_double("Response", success?: true, body: "{\"data\": []}", code: 200) }
+    let(:failure_response) { instance_double("Response", success?: false, body: "{\"error\": \"error_message\"}", code: 400) }
+    it "increments the success count" do
+      allow(Multiwoven::Integrations::Core::HttpClient).to receive(:request).and_return(success_response)
+      sync_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config_json.to_json)
+      message = client.write(sync_config, records)
+      expect(message.tracking.success).to eq(1)
+      expect(message.tracking.failed).to eq(0)
+    end
+
+    it "increments the success count" do
+      allow(Multiwoven::Integrations::Core::HttpClient).to receive(:request).and_return(failure_response)
+      sync_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config_json.to_json)
+      message = client.write(sync_config, records)
+      expect(message.tracking.success).to eq(0)
+      expect(message.tracking.failed).to eq(1)
     end
   end
 

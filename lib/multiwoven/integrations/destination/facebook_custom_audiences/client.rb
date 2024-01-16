@@ -69,6 +69,7 @@ module Multiwoven::Integrations::Destination
             payload: payload,
             headers: auth_headers(access_token)
           )
+          byebug
           if success?(response)
             write_success += 1
           else
