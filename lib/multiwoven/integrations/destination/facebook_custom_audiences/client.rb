@@ -26,6 +26,8 @@ module Multiwoven::Integrations::Destination
 
         streams = catalog_json["streams"].map do |stream|
           Multiwoven::Integrations::Protocol::Stream.new(
+            audience_id: stream["audience_id"],
+            url: stream["url"],
             name: stream["name"],
             json_schema: stream["json_schema"],
             method: stream["method"],
@@ -41,6 +43,52 @@ module Multiwoven::Integrations::Destination
       rescue StandardError => e
         handle_exception(
           "FACEBOOK AUDIENCE:DISCOVER:EXCEPTION",
+          "error",
+          e
+        )
+      end
+
+      def write(sync_config, records, _action = "insert")
+        url = sync_config.stream.url
+        request_method = sync_config.stream.request_method
+
+        write_success = 0
+        write_failure = 0
+        records.each do |record|
+          schema = record.data.keys
+          data = schema.map { |field| record.data[field] }
+          payload = {
+            "payload" => {
+              "schema" => schema,
+              "data" => [data]
+            }
+          }
+          response = Multiwoven::Integrations::Core::HttpClient.request(
+            url,
+            request_method,
+            payload: payload,
+            headers: auth_headers(access_token)
+          )
+          if success?(response)
+            write_success += 1
+          else
+            write_failure += 1
+          end
+        rescue StandardError => e
+          logger.error(
+            "FACEBOOK:RECORD:WRITE:FAILURE: #{e.message}"
+          )
+          write_failure += 1
+        end
+        tracker = Multiwoven::Integrations::Protocol::TrackingMessage.new(
+          success: write_success,
+          failed: write_failure
+        )
+        tracker.to_multiwoven_message
+      rescue StandardError => e
+        # TODO: Handle rate limiting seperately
+        handle_exception(
+          "FACEBOOK:WRITE:EXCEPTION",
           "error",
           e
         )
