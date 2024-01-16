@@ -30,7 +30,7 @@ module Multiwoven::Integrations::Destination
             url: stream["url"],
             name: stream["name"],
             json_schema: stream["json_schema"],
-            method: stream["method"],
+            request_method: stream["method"],
             action: stream["action"]
           )
         end
