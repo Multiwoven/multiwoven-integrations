@@ -4,7 +4,8 @@
       "name": "audience",
       "action": "create",
       "method": "POST",
-      "url": "https://graph.facebook.com/v18.0/120203392923630274/users",
+      "audience_id": "audience_id",
+      "url": "https://graph.facebook.com/v18.0/{audience_id}/users",
       "json_schema": {
         "type": "object",
         "additionalProperties": true,
@@ -31,7 +32,7 @@
       "supported_sync_modes": ["full_refresh", "incremental"],
       "source_defined_cursor": true,
       "default_cursor_field": ["updated"],
-      "source_defined_primary_key": [["id", "email"]]
+      "source_defined_primary_key": [["email"]]
     }
   ]
 }

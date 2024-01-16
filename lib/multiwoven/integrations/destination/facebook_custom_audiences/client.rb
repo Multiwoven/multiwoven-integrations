@@ -50,13 +50,13 @@ module Multiwoven::Integrations::Destination
 
       def write(sync_config, records, _action = "insert")
         url = sync_config.stream.url
-        request_method = sync_config.stream.request_method
+        connection_config = sync_config.destination.connection_specification.with_indifferent_access
+        access_token = connection_config[:access_token]
 
         write_success = 0
         write_failure = 0
         records.each do |record|
-          schema = record.data.keys
-          data = schema.map { |field| record.data[field] }
+          schema, data = extract_schema_and_data(record.data)
           payload = {
             "payload" => {
               "schema" => schema,
@@ -65,7 +65,7 @@ module Multiwoven::Integrations::Destination
           }
           response = Multiwoven::Integrations::Core::HttpClient.request(
             url,
-            request_method,
+            sync_config.stream.request_method,
             payload: payload,
             headers: auth_headers(access_token)
           )
@@ -94,6 +94,10 @@ module Multiwoven::Integrations::Destination
         )
       end
 
+      def extract_schema_and_data(data)
+        [data.keys, data.values]
+      end
+
       def auth_headers(access_token)
         {
           "Accept" => "application/json",
@@ -103,7 +107,7 @@ module Multiwoven::Integrations::Destination
       end
 
       def ad_account_exists?(response, ad_account_id)
-        return if extract_data(response).any? { |ad_account| ad_account["id"] == formatted_ad_account_id(ad_account_id) }
+        return if extract_data(response).any? { |ad_account| ad_account["id"] == "act_#{ad_account_id}" }
 
         raise ArgumentError, "Ad account not found in business account"
       end
@@ -111,10 +115,6 @@ module Multiwoven::Integrations::Destination
       def extract_data(response)
         response_body = response.body
         JSON.parse(response_body)["data"] if response_body
-      end
-
-      def formatted_ad_account_id(ad_account_id)
-        "act_#{ad_account_id}"
       end
     end
   end
