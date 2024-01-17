@@ -22,7 +22,7 @@ module Multiwoven::Integrations::Destination
         ConnectionStatus.new(status: ConnectionStatusType["failed"], message: e.message).to_multiwoven_message
       end
 
-      def discover
+      def discover(_connection_config = nil)
         catalog_json = read_json(CATALOG_SPEC_PATH)
 
         streams = catalog_json["streams"].map do |stream|
