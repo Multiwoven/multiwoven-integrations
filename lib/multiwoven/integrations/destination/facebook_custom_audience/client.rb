@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 module Multiwoven::Integrations::Destination
-  module FacebookCustomAudiences
+  module FacebookCustomAudience
     include Multiwoven::Integrations::Core
-    class Client < DestinationConnector
+    class Client < DestinationConnector # rubocop:disable Metrics/ClassLength
       def check_connection(connection_config)
+        connection_config = connection_config.with_indifferent_access
         access_token = connection_config[:access_token]
         response = Multiwoven::Integrations::Core::HttpClient.request(
           FACEBOOK_AUDIENCE_GET_ALL_ACCOUNTS,
@@ -51,12 +52,13 @@ module Multiwoven::Integrations::Destination
       def write(sync_config, records, _action = "insert")
         url = sync_config.stream.url
         connection_config = sync_config.destination.connection_specification.with_indifferent_access
+        connection_config = connection_config.with_indifferent_access
         access_token = connection_config[:access_token]
 
         write_success = 0
         write_failure = 0
         records.each do |record|
-          schema, data = extract_schema_and_data(record.data)
+          schema, data = extract_schema_and_data(record.with_indifferent_access[:data])
           payload = {
             "payload" => {
               "schema" => schema,

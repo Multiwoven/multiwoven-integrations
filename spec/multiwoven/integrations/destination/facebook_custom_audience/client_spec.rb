@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudiences::Client do
+RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudience::Client do
   include WebMock::API
 
   before(:each) do
@@ -110,7 +110,7 @@ RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudiences::C
       expect(message.tracking.failed).to eq(0)
     end
 
-    it "increments the success count" do
+    it "increments the failure count" do
       allow(Multiwoven::Integrations::Core::HttpClient).to receive(:request).and_return(failure_response)
       sync_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config_json.to_json)
       message = client.write(sync_config, records)
@@ -120,9 +120,6 @@ RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudiences::C
   end
 
   def build_record(email, country)
-    Multiwoven::Integrations::Protocol::RecordMessage.new(
-      data: { "EMAIL": email, "COUNTRY": country },
-      emitted_at: Time.now.to_i
-    )
+    {data: { "EMAIL": email, "COUNTRY": country } }
   end
 end

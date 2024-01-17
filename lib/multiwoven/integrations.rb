@@ -35,7 +35,7 @@ require_relative "integrations/source/bigquery/client"
 # Destination
 require_relative "integrations/destination/klaviyo/client"
 require_relative "integrations/destination/salesforce_crm/client"
-require_relative "integrations/destination/facebook_custom_audiences/client"
+require_relative "integrations/destination/facebook_custom_audience/client"
 
 module Multiwoven
   module Integrations
