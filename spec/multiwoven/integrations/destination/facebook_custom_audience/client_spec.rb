@@ -120,6 +120,6 @@ RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudience::Cl
   end
 
   def build_record(email, country)
-    {data: { "EMAIL": email, "COUNTRY": country } }
+    { data: { "EMAIL": email, "COUNTRY": country } }
   end
 end
