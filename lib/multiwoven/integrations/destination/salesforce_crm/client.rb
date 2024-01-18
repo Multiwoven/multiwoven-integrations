@@ -27,7 +27,8 @@ module Multiwoven
             handle_exception("SALESFORCE:CRM:DISCOVER:EXCEPTION", "error", e)
           end
 
-          def write(sync_config, records, _action = "create")
+          def write(sync_config, records, action = "create")
+            @action = action || stream[:json_schema][:properties][:action]
             initialize_client(sync_config[:destination][:connection_specification])
             process_records(records, sync_config[:stream])
           rescue StandardError => e
@@ -56,8 +57,8 @@ module Multiwoven
               process_record(stream, record)
               write_success += 1
             rescue StandardError => e
-              handle_exception("SALESFORCE:CRM:WRITE:EXCEPTION", "error", e)
               write_failure += 1
+              handle_exception("SALESFORCE:CRM:WRITE:EXCEPTION", "error", e)
             end
             tracking_message(write_success, write_failure)
           end
@@ -77,7 +78,7 @@ module Multiwoven
             when :upsert
               [stream_name, record[:external_key], record]
             when :destroy
-              [stream_name, record[:id]]
+              [stream_name, record[:Id]]
             else
               [stream_name, record]
             end

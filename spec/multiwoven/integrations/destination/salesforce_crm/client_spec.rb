@@ -106,6 +106,27 @@ RSpec.describe Multiwoven::Integrations::Destination::SalesforceCrm::Client do
         expect(response.tracking.success).to eq(0)
       end
     end
+
+    context "when checking action value" do
+      before do
+        stub_create_request(1, "Account Name 1", 403)
+        stub_create_request(2, "Account Name 2", 403)
+      end
+
+      it "sets @action to the correct value" do
+        client.write(sync_config, records, "update")
+        action_value = client.instance_variable_get(:@action)
+
+        expect(action_value).to eq("update")
+      end
+
+      it "sets @action to default value if not provided" do
+        client.write(sync_config, records)
+        action_value = client.instance_variable_get(:@action)
+
+        expect(action_value).to eq("create")
+      end
+    end
   end
 
   private
