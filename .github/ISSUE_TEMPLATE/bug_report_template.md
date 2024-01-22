@@ -1,29 +1,29 @@
 ---
 name: Bug Report
-about: Report a bug in the Ruby gem
-title: "[BUG]: Brief Description"
+about: Report a bug in the Multiwoven integration gem
+title: "[BUG]: Brief Description" # e.g [BUG]: Salesforce Connector Authentication Failure
 labels: 'bug'
 assignees: ''
 
 ---
 
 ## Description
-<!-- A clear and concise description of what the bug is -->
+<!-- A clear and concise description of what the bug is e.g Salesforce connector fails to authenticate with valid credentials -->
 
 ## Steps to Reproduce
-<!-- Steps to reproduce the behavior -->
+<!-- Steps to reproduce the behavior e.g. 1. Enter Salesforce credentials. 2. Attempt to connect. 3. Observe authentication failure. -->
 
 ## Expected Behavior
-<!-- A clear and concise description of what you expected to happen -->
+<!-- A clear and concise description of what you expected to happen e.g. Connector should authenticate successfully and allow data retrieval from Salesforce. -->
 
 ## Actual Behavior
-<!-- What actually happened -->
+<!-- What actually happened e.g. Authentication fails and returns an 'Invalid Credentials' error. -->
 
 ## Possible Solution
-<!-- Not obligatory, but suggest a fix/reason for the bug -->
+<!-- Not obligatory, but suggest a fix/reason for the bug e.g. Review and update the authentication module in the Salesforce connector. -->
 
 ## Your Environment
-<!-- Include as many relevant details about the environment you experienced the bug in -->
+<!-- Include as many relevant details about the environment you experienced the bug in e.g. Ruby version 2.7.0, Salesforce connector version 1.2.3 -->
 
 ## Gem Specific Questions
 - [ ] Is this bug related to a specific connector in the gem?

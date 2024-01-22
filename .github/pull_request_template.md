@@ -1,17 +1,19 @@
 ---
 name: Pull Request Template
 about: Template for creating a new pull request for a Multiwoven integrations gem
-title: "[TYPE]: Brief Description"
+title: "[TYPE]: Brief Description" # e.g. Enhance Salesforce Connector Performance
 labels: ''
 assignees: ''
 
 ---
 
 ## Description
-<!-- A brief description of what this pull request does. Include the purpose of the change and any relevant context. -->
+<!-- A brief description of what this pull request does. Include the purpose of the change and any relevant context. e.g
+ This PR enhances the performance of the Salesforce connector by implementing batch data processing. -->
 
 ## Related Issue
-<!-- Link to any related issues or indicate 'None' if applicable -->
+<!-- Link to any related issues or indicate 'None' if applicable e.g
+ Relates to issue #123 - 'Improve Salesforce Connector Efficiency'. If none, state 'None'. -->
 
 ## Type of Change
 - [ ] New Connector (Destination or Source Connector)
@@ -21,7 +23,8 @@ assignees: ''
 - [ ] Documentation update
 
 ## How Has This Been Tested?
-<!-- Describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration. -->
+<!-- Describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration. e.g
+Tested with a batch of 10,000 records to ensure data integrity and monitor performance improvements. -->
 
 ## Checklist:
 - [ ] My code follows Ruby style guidelines
@@ -36,7 +39,8 @@ assignees: ''
 ## Screenshots (if appropriate):
 
 ## Additional Notes
-<!-- Any additional information that you think is important. -->
+<!-- Any additional information that you think is important. e.g
+The batch processing implementation may require further optimization based on data size. -->
 
 ## Gem Specific Questions
 - [ ] Have you updated the version number of the gem?
@@ -48,4 +52,5 @@ assignees: ''
 - [ ] If your changes affect public API, have you updated the documentation?
 
 ## Merging and Release Plan
-<!-- Outline your plan for merging and releasing the changes. This could include steps for manual testing, release scheduling, or coordinating with other team members. -->
+<!-- Outline your plan for merging and releasing the changes. This could include steps for manual testing, release scheduling, or coordinating with other team members. e.g
+Plan to merge after one additional team member reviews for accuracy and relevance. -->
