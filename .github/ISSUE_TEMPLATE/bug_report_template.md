@@ -22,15 +22,7 @@ assignees: ''
 ## Possible Solution
 <!-- Not obligatory, but suggest a fix/reason for the bug e.g. Review and update the authentication module in the Salesforce connector. -->
 
-## Your Environment
-<!-- Include as many relevant details about the environment you experienced the bug in e.g. Ruby version 2.7.0, Salesforce connector version 1.2.3 -->
-
 ## Gem Specific Questions
 - [ ] Is this bug related to a specific connector in the gem?
 - [ ] Have you tested this issue with other versions of the gem?
 
-## Screenshots
-<!-- If applicable, add screenshots to help explain your problem -->
-
-## Additional Context
-<!-- Add any other context about the problem here -->
