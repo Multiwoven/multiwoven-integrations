@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["subin@multiwoven.com"]
 
   spec.summary = "Integration suite for open source reverse ETL platform"
-  spec.description = "Multiwoven Integrations is a comprehensive Ruby gem designed to facilitate seamless connectivity between various data sources and SaaS platforms. Serving as a robust wrapper for connectors, it simplifies the implementation of reverse ETL processes, enabling efficient data movement and synchronization. Ideal for use in open-source environments, this gem streamlines the integration of diverse data systems, enhancing the functionality and flexibility of reverse ETL workflows."
+  spec.description = "Multiwoven Integrations is a comprehensive Ruby gem designed to facilitate seamless connectivity between various data sources and SaaS platforms."
 
   spec.homepage = "https://www.multiwoven.com/"
   spec.license = "MIT"
