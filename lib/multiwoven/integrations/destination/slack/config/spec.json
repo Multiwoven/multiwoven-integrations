@@ -11,6 +11,11 @@
         "type": "string",
         "title": "API Token",
         "order": 0
+      },
+      "channel_id": {
+        "type": "string",
+        "title": "Channel ID",
+        "order": 1
       }
     }
   }
