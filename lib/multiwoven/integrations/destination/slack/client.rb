@@ -51,7 +51,7 @@ module Multiwoven
             write_success = 0
             write_failure = 0
             records.each do |record_object|
-              process_record(stream, record_object)
+              process_record(stream, record_object.with_indifferent_access)
               write_success += 1
             rescue StandardError => e
               write_failure += 1
@@ -72,7 +72,7 @@ module Multiwoven
           def build_args(stream_name, record)
             case stream_name
             when "chat_postMessage"
-              { channel: channel_id, text: slack_code_block(record.data) }
+              { channel: channel_id, text: slack_code_block(record[:data]) }
             else
               raise "Stream name not found: #{stream_name}"
             end
