@@ -43,6 +43,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "restforce"
   spec.add_runtime_dependency "ruby-odbc"
   spec.add_runtime_dependency "sequel"
+  spec.add_runtime_dependency "slack-ruby-client"
+  spec.add_runtime_dependency "async-websocket"
 
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "rspec"
