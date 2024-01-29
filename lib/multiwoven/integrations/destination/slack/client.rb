@@ -29,11 +29,12 @@ module Multiwoven
             # Currently as we only create a message for each record in slack, we are not using actions.
             # This will be changed in future.
 
-            @action = action || stream[:json_schema][:properties][:action]
-            configure_slack(sync_config[:destination][:connection_specification][:api_token])
+            @action = sync_config.stream.action || action
+            connection_config = sync_config.destination.connection_specification.with_indifferent_access
+            configure_slack(connection_config[:api_token])
             @client = ::Slack::Web::Client.new
-            @channel_id = sync_config[:destination][:connection_specification][:channel_id]
-            process_records(records, sync_config[:stream])
+            @channel_id = connection_config[:channel_id]
+            process_records(records, sync_config.stream)
           rescue StandardError => e
             handle_exception("SLACK:WRITE:EXCEPTION", "error", e)
           end
@@ -71,7 +72,7 @@ module Multiwoven
           def build_args(stream_name, record)
             case stream_name
             when "chat_postMessage"
-              { channel: channel_id, text: slack_code_block(record[:data]) }
+              { channel: channel_id, text: slack_code_block(record.data) }
             else
               raise "Stream name not found: #{stream_name}"
             end
