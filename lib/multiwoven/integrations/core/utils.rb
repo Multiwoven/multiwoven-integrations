@@ -65,7 +65,7 @@ module Multiwoven
       end
 
       def extract_data(record_object, properties)
-        record_object.data.select { |key, _| properties.key?(key.to_s) }
+        record_object[:data].select { |key, _| properties.key?(key) }
       end
 
       def success?(response)

@@ -28,8 +28,8 @@ module Multiwoven
           end
 
           def write(sync_config, records, _action = "create")
-            initialize_client(sync_config[:destination][:connection_specification])
-            process_records(records, sync_config[:stream])
+            initialize_client(sync_config.destination.connection_specification)
+            process_records(records, sync_config.stream)
           rescue StandardError => e
             handle_exception("SALESFORCE:CRM:WRITE:EXCEPTION", "error", e)
           end
@@ -50,7 +50,7 @@ module Multiwoven
           def process_records(records, stream)
             write_success = 0
             write_failure = 0
-            properties = stream[:json_schema][:properties]
+            properties = stream.json_schema[:properties]
             records.each do |record_object|
               record = extract_data(record_object, properties)
               process_record(stream, record)
@@ -63,7 +63,7 @@ module Multiwoven
           end
 
           def process_record(stream, record)
-            send_data_to_salesforce(stream[:action], stream[:name], record)
+            send_data_to_salesforce(stream.action, stream.name, record)
           end
 
           def send_data_to_salesforce(action, stream_name, record = {})
