@@ -98,7 +98,7 @@ RSpec.describe Multiwoven::Integrations::Destination::SalesforceCrm::Client do
 
       it "increments the success count" do
         response = client.write(sync_config, records)
-        
+
         expect(response.tracking.success).to eq(records.size)
         expect(response.tracking.failed).to eq(0)
       end
@@ -123,7 +123,7 @@ RSpec.describe Multiwoven::Integrations::Destination::SalesforceCrm::Client do
 
   def build_record(id, name)
     {
-      "data": { "Id": id, "Name": name, NonListedField: "NonListedField Value" },
+      "data": { "attributes": { "Id": id, "Name": name, NonListedField: "NonListedField Value" } },
       "emitted_at": Time.now.to_i
     }
   end
@@ -132,11 +132,8 @@ RSpec.describe Multiwoven::Integrations::Destination::SalesforceCrm::Client do
     stub_request(:post, "https://your-instance-url.salesforce.com/services/data/v59.0/sobjects/Account")
       .with(
         body: hash_including("Id" => id, "Name" => name),
-        headers: {
-          "Accept" => "*/*",
-          "Authorization" => "OAuth",
-          "Content-Type" => "application/json"
-        }
+        headers: { "Accept" => "*/*", "Authorization" => "OAuth",
+                   "Content-Type" => "application/json" }
       ).to_return(status: response_code, body: "", headers: {})
   end
 

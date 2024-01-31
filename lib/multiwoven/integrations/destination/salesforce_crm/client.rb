@@ -27,7 +27,8 @@ module Multiwoven
             handle_exception("SALESFORCE:CRM:DISCOVER:EXCEPTION", "error", e)
           end
 
-          def write(sync_config, records, _action = "create")
+          def write(sync_config, records, action = "create")
+            @action = sync_config.stream.action || action
             initialize_client(sync_config.destination.connection_specification)
             process_records(records, sync_config.stream)
           rescue StandardError => e
@@ -63,12 +64,12 @@ module Multiwoven
           end
 
           def process_record(stream, record)
-            send_data_to_salesforce(stream.action, stream.name, record)
+            send_data_to_salesforce(stream.name, record)
           end
 
-          def send_data_to_salesforce(action, stream_name, record = {})
-            method_name = "#{action}!"
-            args = build_args(action, stream_name, record)
+          def send_data_to_salesforce(stream_name, record = {})
+            method_name = "#{@action}!"
+            args = build_args(@action, stream_name, record)
             @client.send(method_name, *args)
           end
 
