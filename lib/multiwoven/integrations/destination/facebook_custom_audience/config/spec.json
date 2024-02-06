@@ -19,8 +19,8 @@
       },
       "audience_id": {
         "type": "string",
-        "title": "Ad Account Id",
-        "order": 12
+        "title": "Audience Id",
+        "order": 2
       }
     }
   }

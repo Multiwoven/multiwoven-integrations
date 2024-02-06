@@ -110,7 +110,7 @@ module Multiwoven::Integrations::Destination
 
         data.each do |key, value|
           schema_key = key.upcase
-          encrypted_value = schema_properties[schema_key] && schema_properties[schema_key][:hashRequired] ? Digest::SHA256.hexdigest(value.to_s) : value
+          encrypted_value = schema_properties[schema_key] && schema_properties[schema_key]["x-hashRequired"] ? Digest::SHA256.hexdigest(value.to_s) : value
           encrypted_data_array << encrypted_value
         end
 
