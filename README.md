@@ -5,35 +5,67 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/d841270f1f7a966043c1/maintainability)](https://codeclimate.com/repos/657d0a2a60265a2f2155ffca/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/d841270f1f7a966043c1/test_coverage)](https://codeclimate.com/repos/657d0a2a60265a2f2155ffca/test_coverage)
 
-TODO: Delete this and the text below, and describe your gem
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/multiwoven/integrations`. To experiment with that code, run `bin/console` for an interactive prompt.
+Multiwoven integrations is the collection of connectors built on top of Multiwoven protcol.
+
+Multiwoven protocol is an open source standard for moving data between data sources to any third-part destinations.
+Anyone can build a connetor with basic ruby knowledge and multiwoven protocol understanding. 
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+    $ bundle add multiwoven-integrations
 
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
 
 ## Usage
 
-TODO: Write usage instructions here
+### Source
+```
+source = Multiwoven::Integrations::Source::[CONNECTOR_NAME]::Client.new
+source.read(sync_config)
+```
+### Destination
+
+```
+destination = Multiwoven::Integrations::Destination::[CONNECTOR_NAME]::Client.new
+destination.write(sync_config, records)
+```
+
+### Supported methods 
+Please refer [Multiwoven Protocol](https://docs.multiwoven.com/guides/architecture/multiwoven-protocol)
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+- **Install Dependencies**
+  - Command: `bin/setup`
+  - Description: After checking out the repo, run this command to install dependencies.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+- **Run Tests**
+  - Command: `rake spec`
+  - Description: Run this command to execute the tests.
+
+- **Interactive Prompt**
+  - Command: `bin/console`
+  - Description: For an interactive prompt that allows you to experiment, run this command.
+
+- **Install Gem Locally**
+  - Command: `bundle exec rake install`
+  - Description: To install this gem onto your local machine, run this command.
+
+- **Release New Version**
+  - Steps:
+    1. Update the version number in `rollout.rb`.
+    2. Command: `bundle exec rake release`
+    3. Description: This command will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/multiwoven-integrations. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/multiwoven-integrations/blob/main/CODE_OF_CONDUCT.md).
+- **Bug Reports and Pull Requests**
+  - Location: GitHub at https://github.com/Multiwoven/multiwoven-integrations
+  - Description: Bug reports and pull requests are welcome on GitHub. This project aims to be a safe, welcoming space for collaboration.
+
 
 ## License
 
@@ -41,4 +73,5 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Multiwoven::Integrations project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/multiwoven-integrations/blob/main/CODE_OF_CONDUCT.md).
+  - Link: [Code of Conduct](https://github.com/Multiwoven/multiwoven-integrations/blob/main/CODE_OF_CONDUCT.md)
+  - Description: Contributors are expected to adhere to the project's code of conduct.
