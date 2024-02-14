@@ -1,5 +1,19 @@
 ## [Unreleased]
 
+## [0.4.0](https://www.github.com/Multiwoven/multiwoven-integrations/compare/v0.3.0...v0.4.0) (2024-02-14)
+
+
+### Features
+
+* Bump version to 1.21 ([#62](https://www.github.com/Multiwoven/multiwoven-integrations/issues/62)) ([7b1476d](https://www.github.com/Multiwoven/multiwoven-integrations/commit/7b1476d4b04a073ab060971019095d0a13ebd153))
+
+## [0.3.0](https://www.github.com/Multiwoven/multiwoven-integrations/compare/v0.2.0...v0.3.0) (2024-02-14)
+
+
+### Features
+
+* Publish gem to rubygems ([#60](https://www.github.com/Multiwoven/multiwoven-integrations/issues/60)) ([04cfbb6](https://www.github.com/Multiwoven/multiwoven-integrations/commit/04cfbb60c78bc90d886ce691d5094fed9c6f078f))
+
 ## [0.2.0](https://www.github.com/Multiwoven/multiwoven-integrations/compare/v0.1.0...v0.2.0) (2024-02-14)
 
 
