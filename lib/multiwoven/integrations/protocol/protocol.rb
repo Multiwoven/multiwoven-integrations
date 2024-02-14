@@ -116,8 +116,8 @@ module Multiwoven
       # Applicable for API streams
       attribute? :url, Types::String.optional
       attribute? :request_method, Types::String.optional
-      attribute? :batch_support, Types::Bool.optional
-      attribute? :batch_size, Types::Integer.optional
+      attribute :batch_support, Types::Bool.default(false)
+      attribute :batch_size, Types::Integer.default(1)
     end
 
     class Catalog < ProtocolModel
