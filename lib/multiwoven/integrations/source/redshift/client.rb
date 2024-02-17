@@ -35,7 +35,7 @@ module Multiwoven::Integrations::Source
         catalog.to_multiwoven_message
       rescue StandardError => e
         handle_exception(
-          "REDSHIFT:DISCOVER:EXCEPTION",
+          "#{connector_name.upcase}:DISCOVER:EXCEPTION",
           "error",
           e
         )
@@ -54,7 +54,7 @@ module Multiwoven::Integrations::Source
         query(db, query)
       rescue StandardError => e
         handle_exception(
-          "REDSHIFT:READ:EXCEPTION",
+          "#{connector_name.upcase}:READ:EXCEPTION",
           "error",
           e
         )
@@ -103,6 +103,10 @@ module Multiwoven::Integrations::Source
             end
           }
         end
+      end
+
+      def connector_name
+        self.class.name.split("::")[-2]
       end
     end
   end
