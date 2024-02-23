@@ -123,6 +123,19 @@ module Multiwoven
       attribute? :request_rate_limit, Types::Integer
       attribute? :request_rate_limit_unit, RequestRateLimitingUnit
       attribute? :request_rate_concurrency, Types::Integer
+
+      def rate_limit_unit_seconds
+        case request_rate_limit_unit
+        when "minute"
+          60 # Seconds in a minute
+        when "hour"
+          3600 # Seconds in an hour
+        when "day"
+          86_400 # Seconds in a day
+        else
+          1 # Default case, consider as seconds or handle as error
+        end
+      end
     end
 
     class Catalog < ProtocolModel

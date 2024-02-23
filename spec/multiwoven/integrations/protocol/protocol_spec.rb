@@ -180,6 +180,7 @@ module Multiwoven
           expect(instance.request_rate_limit).to eq(100)
           expect(instance.request_rate_limit_unit).to eq("minute")
           expect(instance.request_rate_concurrency).to eq(10)
+          expect(instance.rate_limit_unit_seconds).to eq(60)
         end
       end
     end
