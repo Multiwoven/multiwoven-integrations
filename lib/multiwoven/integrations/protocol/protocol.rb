@@ -123,6 +123,11 @@ module Multiwoven
     class Catalog < ProtocolModel
       attribute :streams, Types::Array.of(Stream)
 
+      # global rate limit
+      attribute? :request_rate_limit, Types::Integer.default(60)
+      attribute? :request_rate_limit_unit, Types::String.default("minute")
+      attribute? :request_rate_concurrency, Types::Integer.default(10)
+
       def to_multiwoven_message
         MultiwovenMessage.new(
           type: MultiwovenMessageType["catalog"],
