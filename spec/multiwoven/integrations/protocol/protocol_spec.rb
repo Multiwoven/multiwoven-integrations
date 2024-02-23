@@ -146,7 +146,7 @@ module Multiwoven
           expect(instance.supported_sync_modes).to eq(%w[full_refresh incremental])
 
           expect(instance.request_rate_limit).to be_nil
-          expect(instance.request_rate_limit_unit).to be_nil
+          expect(instance.request_rate_limit_unit).to eq("minute")
           expect(instance.request_rate_concurrency).to be_nil
         end
 

@@ -23,6 +23,7 @@ module Multiwoven
       "rate_limit", "connection_config"
     )
     LogLevel = Types::String.enum("fatal", "error", "warn", "info", "debug", "trace")
+    RequestRateLimitingUnit = Types::String.default("minute").enum("minute", "hour", "day")
 
     class ProtocolModel < Dry::Struct
       extend Multiwoven::Integrations::Core::Utils
@@ -118,18 +119,18 @@ module Multiwoven
       attribute? :request_method, Types::String.optional
       attribute :batch_support, Types::Bool.default(false)
       attribute :batch_size, Types::Integer.default(1)
-      # rate limits
+      # Rate limits
       attribute? :request_rate_limit, Types::Integer
-      attribute? :request_rate_limit_unit, Types::String
+      attribute? :request_rate_limit_unit, RequestRateLimitingUnit
       attribute? :request_rate_concurrency, Types::Integer
     end
 
     class Catalog < ProtocolModel
       attribute :streams, Types::Array.of(Stream)
 
-      # global rate limit
+      # Rate limits
       attribute? :request_rate_limit, Types::Integer.default(60)
-      attribute? :request_rate_limit_unit, Types::String.default("minute")
+      attribute? :request_rate_limit_unit, RequestRateLimitingUnit
       attribute? :request_rate_concurrency, Types::Integer.default(10)
 
       def to_multiwoven_message
