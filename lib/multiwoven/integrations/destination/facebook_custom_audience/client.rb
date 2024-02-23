@@ -34,12 +34,18 @@ module Multiwoven::Integrations::Destination
             request_method: stream["method"],
             action: stream["action"],
             batch_support: stream["batch_support"],
-            batch_size: stream["batch_size"]
+            batch_size: stream["batch_size"],
+            request_rate_limit: stream["request_rate_limit"].to_i,
+            request_rate_limit_unit: stream["request_rate_limit_unit"] || "minute",
+            request_rate_concurrency: stream["request_rate_concurrency"].to_i
           )
         end
 
         catalog = Multiwoven::Integrations::Protocol::Catalog.new(
-          streams: streams
+          streams: streams,
+          request_rate_limit: catalog_json["request_rate_limit"].to_i,
+          request_rate_limit_unit: catalog_json["request_rate_limit_unit"] || "minute",
+          request_rate_concurrency: catalog_json["request_rate_concurrency"].to_i
         )
 
         catalog.to_multiwoven_message
