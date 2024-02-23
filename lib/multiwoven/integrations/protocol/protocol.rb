@@ -118,6 +118,10 @@ module Multiwoven
       attribute? :request_method, Types::String.optional
       attribute :batch_support, Types::Bool.default(false)
       attribute :batch_size, Types::Integer.default(1)
+      # rate limits
+      attribute? :request_rate_limit, Types::Integer
+      attribute? :request_rate_limit_unit, Types::String
+      attribute? :request_rate_concurrency, Types::Integer
     end
 
     class Catalog < ProtocolModel

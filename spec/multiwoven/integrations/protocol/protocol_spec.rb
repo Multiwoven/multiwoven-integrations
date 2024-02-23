@@ -144,6 +144,10 @@ module Multiwoven
           expect(instance.batch_support).to eq(false)
           expect(instance.batch_size).to eq(1)
           expect(instance.supported_sync_modes).to eq(%w[full_refresh incremental])
+
+          expect(instance.request_rate_limit).to be_nil
+          expect(instance.request_rate_limit_unit).to be_nil
+          expect(instance.request_rate_concurrency).to be_nil
         end
 
         it "creates an instance from JSON and batch param check" do
@@ -159,7 +163,10 @@ module Multiwoven
             "url": "https://api.example.com/data",
             "request_method": "GET",
             "batch_support": true,
-            "batch_size": 10_000
+            "batch_size": 10_000,
+            "request_rate_limit": 100,
+            "request_rate_limit_unit": "minute",
+            "request_rate_concurrency": 10
           }.to_json
           instance = Stream.from_json(json_data)
           expect(instance).to be_a(Stream)
@@ -169,6 +176,10 @@ module Multiwoven
           expect(instance.batch_support).to eq(true)
           expect(instance.batch_size).to eq(10_000)
           expect(instance.supported_sync_modes).to eq(%w[full_refresh incremental])
+
+          expect(instance.request_rate_limit).to eq(100)
+          expect(instance.request_rate_limit_unit).to eq("minute")
+          expect(instance.request_rate_concurrency).to eq(10)
         end
       end
     end
