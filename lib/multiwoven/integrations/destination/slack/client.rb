@@ -79,10 +79,9 @@ module Multiwoven
           end
 
           def slack_code_block(data)
-            longest_key = data.keys.map(&:to_s).max_by(&:length).length
             table_str = "```\n"
-            data.each do |key, value|
-              table_str += "#{key.to_s.ljust(longest_key)} : #{value}\n"
+            data.each_value do |value|
+              table_str += "#{value}\n"
             end
             table_str += "```"
 
