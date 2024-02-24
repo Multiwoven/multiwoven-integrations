@@ -8,7 +8,7 @@ module Multiwoven
       module SalesforceCrm
         include Multiwoven::Integrations::Core
 
-        API_VERSION = "59.0"
+        API_VERSION = "60.0"
 
         class Client < DestinationConnector
           def check_connection(connection_config)
