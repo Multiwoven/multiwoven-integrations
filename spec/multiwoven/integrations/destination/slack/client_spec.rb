@@ -93,9 +93,9 @@ RSpec.describe Multiwoven::Integrations::Destination::Slack::Client do # rubocop
       message = client.discover
       catalog = message.catalog
       expect(catalog).to be_a(Multiwoven::Integrations::Protocol::Catalog)
-      expect(catalog.request_rate_limit).to eql(0)
+      expect(catalog.request_rate_limit).to eql(60)
       expect(catalog.request_rate_limit_unit).to eql("minute")
-      expect(catalog.request_rate_concurrency).to eql(0)
+      expect(catalog.request_rate_concurrency).to eql(10)
 
       message_stream = catalog.streams.first
       expect(message_stream.request_rate_limit).to eql(60)

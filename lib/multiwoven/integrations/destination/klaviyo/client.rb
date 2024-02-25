@@ -21,24 +21,7 @@ module Multiwoven::Integrations::Destination
         catalog_json = read_json(CATALOG_SPEC_PATH)
 
         streams = catalog_json["streams"].map do |stream|
-          Multiwoven::Integrations::Protocol::Stream.new(
-            name: stream["name"],
-            json_schema: stream["json_schema"],
-            url: stream["url"],
-            request_method: stream["method"],
-            action: stream["action"],
-            request_rate_limit: stream["request_rate_limit"].to_i,
-            request_rate_limit_unit: stream["request_rate_limit_unit"] || "minute",
-            request_rate_concurrency: stream["request_rate_concurrency"].to_i
-          )
-        end
-
-        catalog = Multiwoven::Integrations::Protocol::Catalog.new(
-          streams: streams,
-          request_rate_limit: catalog_json["request_rate_limit"].to_i,
-          request_rate_limit_unit: catalog_json["request_rate_limit_unit"] || "minute",
-          request_rate_concurrency: catalog_json["request_rate_concurrency"].to_i
-        )
+        catalog = build_catalog(catalog_json)
 
         catalog.to_multiwoven_message
       rescue StandardError => e
