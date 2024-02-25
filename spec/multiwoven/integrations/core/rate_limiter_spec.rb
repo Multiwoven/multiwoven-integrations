@@ -14,17 +14,18 @@ RSpec.describe Multiwoven::Integrations::Core::RateLimiter do
     Class.new do
       prepend Multiwoven::Integrations::Core::RateLimiter
 
-      define_method(:write) do |_sync_config, _records, _action = "insert"|
-        puts "write called"
+      define_method(:write) do |sync_config, _records, _action = "insert"|
+        Multiwoven::Integrations::Service.logger.info("write called: stream_name: #{sync_config.stream.name}")
       end
     end.new
   end
 
   describe "#write" do
     it "should set the @queue and call super on calling write" do
-      output = capture_stdout do
-        limiter_class.write(sync_config, records)
-      end
+      expected_message = "write called: stream_name: #{sync_config.stream.name}"
+      expect(Multiwoven::Integrations::Service.logger).to receive(:info).with(expected_message)
+
+      limiter_class.write(sync_config, records)
 
       queue = limiter_class.instance_variable_get(:@queue)
       expect(queue).not_to be_nil
@@ -32,16 +33,13 @@ RSpec.describe Multiwoven::Integrations::Core::RateLimiter do
 
       expect(queue.instance_variable_get(:@size)).to eq(stream.request_rate_limit)
       expect(queue.instance_variable_get(:@interval)).to eq(stream.rate_limit_unit_seconds)
-
-      expect(output).to include("write called")
     end
 
     it "should set the @queue once and call super N times on calling write N times" do
-      output = capture_stdout do
-        10.times { limiter_class.write(sync_config, records) }
-      end
-      expect(output.scan(/write called/).length).to eq(10)
-      expect(output.scan(/Hit the limit for stream/).count).to eq(2)
+      expected_message = "write called: stream_name: #{sync_config.stream.name}"
+      expect(Multiwoven::Integrations::Service.logger).to receive(:info).with(expected_message).exactly(10).times
+      expect(Multiwoven::Integrations::Service.logger).to receive(:info).with(match(/Hit the limit for stream/)).exactly(2).times
+      10.times { limiter_class.write(sync_config, records) }
     end
   end
 end
