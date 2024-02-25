@@ -5,7 +5,8 @@ RSpec.describe Multiwoven::Integrations::Core::RateLimiter do
   let(:stream) do
     instance_double("Stream",
                     request_rate_limit: 4,
-                    rate_limit_unit_seconds: 1)
+                    rate_limit_unit_seconds: 1,
+                    name: "stream_name")
   end
   let(:records) { %w[record1 record2] }
 
@@ -37,20 +38,10 @@ RSpec.describe Multiwoven::Integrations::Core::RateLimiter do
 
     it "should set the @queue once and call super N times on calling write N times" do
       output = capture_stdout do
-        5.times { limiter_class.write(sync_config, records) }
-      end
-
-      # expect(output.scan(/write called/).length).to eq(4)
-      expect(output).to eq(
-        "write called\nwrite called\nwrite called\nwrite called\nHit the limit, waiting\nwrite called\n"
-      )
-    end
-
-    it "should print logs when ratelimiting hit" do
-      output = capture_stdout do
         10.times { limiter_class.write(sync_config, records) }
       end
-      expect(output.scan(/Hit the limit, waiting/).count).to eq(2)
+      expect(output.scan(/write called/).length).to eq(10)
+      expect(output.scan(/Hit the limit for stream/).count).to eq(2)
     end
   end
 end
