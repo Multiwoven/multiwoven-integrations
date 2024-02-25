@@ -19,7 +19,7 @@ module Multiwoven
           end
 
           def discover(_connection_config = nil)
-            catalog = build_catalog(load_catalog_streams)
+            catalog = build_catalog(load_catalog)
             catalog.to_multiwoven_message
           rescue StandardError => e
             handle_exception("SLACK:DISCOVER:EXCEPTION", "error", e)
@@ -97,20 +97,28 @@ module Multiwoven
             ConnectionStatus.new(status: ConnectionStatusType["failed"], message: error.message).to_multiwoven_message
           end
 
-          def load_catalog_streams
-            catalog_json = read_json(CATALOG_SPEC_PATH)
-            catalog_json["streams"].map { |stream| build_stream(stream) }
+          def load_catalog
+            read_json(CATALOG_SPEC_PATH)
           end
 
           def build_stream(stream)
             Multiwoven::Integrations::Protocol::Stream.new(
               name: stream["name"], json_schema: stream["json_schema"],
-              action: stream["action"]
+              action: stream["action"],
+              request_rate_limit: stream["request_rate_limit"].to_i,
+              request_rate_limit_unit: stream["request_rate_limit_unit"] || "minute",
+              request_rate_concurrency: stream["request_rate_concurrency"].to_i
             )
           end
 
-          def build_catalog(streams)
-            Multiwoven::Integrations::Protocol::Catalog.new(streams: streams)
+          def build_catalog(catalog_json)
+            streams = catalog_json["streams"].map { |stream| build_stream(stream) }
+            Multiwoven::Integrations::Protocol::Catalog.new(
+              streams: streams,
+              request_rate_limit: catalog_json["request_rate_limit"].to_i,
+              request_rate_limit_unit: catalog_json["request_rate_limit_unit"] || "minute",
+              request_rate_concurrency: catalog_json["request_rate_concurrency"].to_i
+            )
           end
 
           def tracking_message(success, failure)
