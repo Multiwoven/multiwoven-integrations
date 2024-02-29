@@ -37,13 +37,13 @@ module Multiwoven
 
           def initialize_client(config)
             config = config.with_indifferent_access
-            @client = Hubspot::Client.new(access_token: config[:access_token])
+            @client = ::Hubspot::Client.new(access_token: config[:access_token])
           end
 
           def process_records(records, stream)
             write_success = 0
             write_failure = 0
-            properties = stream.json_schema[:properties]
+            properties = stream.json_schema.with_indifferent_access[:properties]
             records.each do |record_object|
               record = extract_data(record_object, properties)
               process_record(stream, record)
@@ -60,9 +60,8 @@ module Multiwoven
           end
 
           def send_data_to_hubspot(stream_name, record = {})
-            method_name = "#{@action}!"
             args = build_args(@action, stream_name, record)
-            eval("@client.crm.#{stream_name}.basic_api.#{method_name}(simple_public_object_input_for_create: #{args})")
+            eval("@client.crm.#{stream_name}.basic_api.#{@action}(simple_public_object_input_for_create: #{args})") # rubocop:disable Security/Eval, Style/EvalWithLocation
           end
 
           def build_args(action, stream_name, record)
