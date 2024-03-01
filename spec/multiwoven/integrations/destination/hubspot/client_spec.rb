@@ -90,8 +90,8 @@ RSpec.describe Multiwoven::Integrations::Destination::Hubspot::Client do # ruboc
       message = client.discover
       catalog = message.catalog
       expect(catalog).to be_a(Multiwoven::Integrations::Protocol::Catalog)
-      expect(catalog.request_rate_limit).to eql(100_000)
-      expect(catalog.request_rate_limit_unit).to eql("day")
+      expect(catalog.request_rate_limit).to eql(600)
+      expect(catalog.request_rate_limit_unit).to eql("minute")
       expect(catalog.request_rate_concurrency).to eql(10)
 
       account_stream = catalog.streams.first
