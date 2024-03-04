@@ -9,6 +9,7 @@ module Multiwoven
       Redshift
       Bigquery
       Postgresql
+      Databricks
     ].freeze
 
     ENABLED_DESTINATIONS = %w[
