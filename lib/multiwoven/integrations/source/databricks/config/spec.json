@@ -39,6 +39,20 @@
         "examples": "sql/protocolvx/o/1234567489/0000-1111111-abcd90",
         "type": "string",
         "order": 3
+        },
+        "catalog": {
+          "description": "The name of the catalog",
+          "default": "hive_metastore",
+          "type": "string",
+          "title": "Databricks catalog",
+          "order": 4
+        },
+        "schema": {
+          "description": " The default schema tables are written.",
+          "default": "default",
+          "type": "string",
+          "title": "Database schema",
+          "order": 5
         }
       }
     }
