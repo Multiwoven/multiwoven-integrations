@@ -57,5 +57,18 @@ RSpec.describe Multiwoven::Integrations::Source::Databricks::Client do
         expect(connection_status.message).to be_nil
       end
     end
+
+    context "when the connection fails" do
+      it "returns a failed connection status with an error message" do
+        allow(Sequel).to receive(:odbc).and_raise(Sequel::DatabaseConnectionError, "Connection failed")
+
+        result = client.check_connection(sync_config[:source][:connection_specification])
+        expect(result.type).to eq("connection_status")
+
+        connection_status = result.connection_status
+        expect(connection_status.status).to eq("failed")
+        expect(connection_status.message).to eq("Connection failed")
+      end
+    end
   end
 end
