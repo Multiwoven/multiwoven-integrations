@@ -7,41 +7,38 @@
       "type": "object",
       "required": ["host", "port", "database", "schema"],
       "properties": {
-        "credentials": {
-          "title": "",
-          "type": "object",
-          "required": ["host", "port", "access_token", "http_path"],
-          "properties": {
-            "host": {
-              "title": "Server Hostname",
-              "description": "Server host name for the Databricks Cluster. It is different from the SQL Endpoint Cluster.",
-              "type": "string",
-              "examples": "abc-12345678-wxyz.cloud.databricks.com",
-              "order": 0
-            },
-            "port": {
-              "title": "Port",
-              "description": "",
-              "type": "string",
-              "default": "443",
-              "order": 1
-            },
-            "access_token": {
-              "title": "Personal Access Token",
-              "description": "",
-              "type": "string",
-              "multiwoven_secret": true,
-              "order": 2
-            }
-          },
-          "http_path": {
-            "title": "HTTP Path",
-            "description": "",
-            "examples": "sql/protocolvx/o/1234567489/0000-1111111-abcd90",
+        "title": "",
+        "type": "object",
+        "required": ["host", "port", "access_token", "http_path"],
+        "properties": {
+        "host": {
+            "title": "Server Hostname",
+            "description": "Server host name for the Databricks Cluster. It is different from the SQL Endpoint Cluster.",
             "type": "string",
-            "order": 3
-          },
-          "order": 0
+            "examples": "abc-12345678-wxyz.cloud.databricks.com",
+            "order": 0
+        },
+        "port": {
+            "title": "Port",
+            "description": "",
+            "type": "string",
+            "default": "443",
+            "order": 1
+        },
+        "access_token": {
+            "title": "Personal Access Token",
+            "description": "",
+            "type": "string",
+            "multiwoven_secret": true,
+            "order": 2
+        }
+        },
+        "http_path": {
+        "title": "HTTP Path",
+        "description": "",
+        "examples": "sql/protocolvx/o/1234567489/0000-1111111-abcd90",
+        "type": "string",
+        "order": 3
         }
       }
     }
