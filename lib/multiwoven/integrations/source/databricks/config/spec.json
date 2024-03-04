@@ -9,7 +9,7 @@
       "properties": {
         "title": "",
         "type": "object",
-        "required": ["host", "port", "access_token", "http_path"],
+        "required": ["host", "port", "access_token", "http_path", "catalog", "schema"],
         "properties": {
         "host": {
             "title": "Server Hostname",
