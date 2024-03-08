@@ -31,6 +31,8 @@ module Multiwoven
 
       FACEBOOK_AUDIENCE_GET_ALL_ACCOUNTS = "https://graph.facebook.com/v18.0/me/adaccounts?fields=id,name"
 
+      AIRTABLE_AUTH_ENDPOINT = "https://api.airtable.com/v0/meta/whoami"
+
       # HTTP
       HTTP_GET = "GET"
       HTTP_POST = "POST"
