@@ -17,6 +17,7 @@ require "git"
 require "ruby-limiter"
 require "hubspot-api-client"
 require "google/apis/sheets_v4"
+require "stringio"
 
 # Service
 require_relative "integrations/config"
