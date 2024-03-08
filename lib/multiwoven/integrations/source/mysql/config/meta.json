@@ -1,0 +1,15 @@
+{
+  "data": {
+    "name": "Mysql",
+    "title": "MySQL",
+    "connector_type": "source",
+    "category": "Data Warehouse",
+    "documentation_url": "https://docs.multiwoven.com/integrations/sources/postgresql",
+    "github_issue_label": "source-postgresql",
+    "icon": "icon.svg",
+    "license": "MIT",
+    "release_stage": "alpha",
+    "support_level": "community",
+    "tags": ["language:ruby", "multiwoven"]
+  }
+}

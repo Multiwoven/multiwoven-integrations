@@ -43,6 +43,8 @@ gem "hubspot-api-client"
 
 gem "ruby-limiter"
 
+gem "mysql2"
+
 group :development, :test do
   gem "simplecov", require: false
   gem "simplecov_json_formatter", require: false
