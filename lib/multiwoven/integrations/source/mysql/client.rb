@@ -22,12 +22,11 @@ module Multiwoven::Integrations::Source
         connection_config = connection_config.with_indifferent_access
         query = "SELECT table_name, column_name, data_type, is_nullable
                  FROM information_schema.columns
-                 WHERE table_schema = '#{connection_config[:database]}' 
+                 WHERE table_schema = '#{connection_config[:database]}'
                  ORDER BY table_name, ordinal_position;"
 
         db = create_connection(connection_config)
         records = db.query(query).to_a
-        # byebug
         catalog = Catalog.new(streams: create_streams(records))
         catalog.to_multiwoven_message
       rescue StandardError => e
