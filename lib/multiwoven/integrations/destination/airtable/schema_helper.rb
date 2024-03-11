@@ -8,7 +8,7 @@ module Multiwoven
           module_function
 
           def clean_name(name_str)
-            name_str.gsub(" ", "_").strip
+            name_str.strip.gsub(" ", "_")
           end
 
           def get_json_schema(table) # rubocop:disable Metrics/AbcSize,Metrics/PerceivedComplexity
@@ -35,7 +35,6 @@ module Multiwoven
                     complex_type["items"] = Marshal.load(Marshal.dump(SIMPLE_AIRTABLE_TYPES[field_type]))
                   else
                     complex_type["items"] = SCHEMA_TYPES[:STRING]
-                    # LOGGER.warn("Unknown field type: #{field_type}, falling back to `simpleText` type")
                   end
                 end
                 properties[name] = complex_type
@@ -63,7 +62,7 @@ module Multiwoven
             DATETIME: { "type": %w[null string], "format": "date-time" },
             ARRAY_WITH_STRINGS: { "type": %w[null array], "items": { "type": %w[null string] } },
             ARRAY_WITH_ANY: { "type": %w[null array], "items": {} }
-          }.freeze
+          }.freeze.with_indifferent_access
 
           SIMPLE_AIRTABLE_TYPES = {
             "multipleAttachments" => SCHEMA_TYPES[:STRING],
@@ -103,7 +102,7 @@ module Multiwoven
             "lookup" => SCHEMA_TYPES[:ARRAY_WITH_ANY],
             "multipleLookupValues" => SCHEMA_TYPES[:ARRAY_WITH_ANY],
             "rollup" => SCHEMA_TYPES[:ARRAY_WITH_ANY]
-          }.freeze
+          }.freeze.with_indifferent_access
 
           ARRAY_FORMULAS = %w[ARRAYCOMPACT ARRAYFLATTEN ARRAYUNIQUE ARRAYSLICE].freeze
         end
