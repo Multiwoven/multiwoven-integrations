@@ -8,9 +8,6 @@ module Multiwoven
 
         class Client < DestinationConnector # rubocop:disable Metrics/ClassLength
           MAX_CHUNK_SIZE = 10_000
-          GOOGLE_SHEETS_SCOPE = "https://www.googleapis.com/auth/drive"
-          GOOGLE_SHEETS_SCHEMA_URL = "http://json-schema.org/draft-07/schema#"
-          SPREADSHEET_ID_REGEX = %r{/d/([-\w]{20,})/}.freeze
 
           def check_connection(connection_config)
             authorize_client(connection_config)
@@ -23,8 +20,8 @@ module Multiwoven
 
           def discover(connection_config)
             authorize_client(connection_config)
-            spreadsheet = fetch_google_spread_sheets(connection_config)
-            catalog = build_catalog_from_spreadsheet(spreadsheet, connection_config)
+            spreadsheets = fetch_google_spread_sheets(connection_config)
+            catalog = build_catalog_from_spreadsheets(spreadsheets, connection_config)
             catalog.to_multiwoven_message
           rescue StandardError => e
             handle_exception("GOOGLE_SHEETS:CRM:DISCOVER:EXCEPTION", "error", e)
@@ -39,6 +36,7 @@ module Multiwoven
 
           private
 
+          # To define the level of access granted to your app, you need to identify and declare authorization scopes which is provided by google scopse https://developers.google.com/sheets/api/scopes
           def authorize_client(config)
             credentials = config[:credentials_json]
             @client = Google::Apis::SheetsV4::SheetsService.new
@@ -48,12 +46,14 @@ module Multiwoven
             )
           end
 
+          # Extract spreadsheet id from the spreadsheet link and return the metadata for all the sheets
           def fetch_google_spread_sheets(connection_config)
             spreadsheet_id = extract_spreadsheet_id(connection_config[:spreadsheet_link])
             @client.get_spreadsheet(spreadsheet_id)
           end
 
-          def build_catalog_from_spreadsheet(spreadsheet, connection_config)
+          # dynamically builds catalog based on spreadsheet metadata
+          def build_catalog_from_spreadsheets(spreadsheet, connection_config)
             catalog = build_catalog(load_catalog)
             @spreadsheet_id = extract_spreadsheet_id(connection_config[:spreadsheet_link])
 
@@ -64,6 +64,7 @@ module Multiwoven
             catalog
           end
 
+          # Builds catalog for the single spreadsheet based on column name
           def process_sheet_for_catalog(sheet, catalog)
             sheet_name, last_column_index = extract_sheet_properties(sheet)
             column_names = fetch_column_names(sheet_name, last_column_index)
@@ -95,8 +96,10 @@ module Multiwoven
             {
               name: sheet_name,
               action: "create",
+              batch_support: true,
+              batch_size: 10000,
               json_schema: generate_properties_schema(column_names),
-              supported_sync_modes: %w[full_refresh incremental]
+              supported_sync_modes: %w[incremental]
             }.with_indifferent_access
           end
 
@@ -105,7 +108,7 @@ module Multiwoven
               props[field] = { "type" => "string" }
             end
 
-            { "$schema" => GOOGLE_SHEETS_SCHEMA_URL, "type" => "object", "properties" => properties }
+            { "$schema" => JSON_SCHEMA_URL, "type" => "object", "properties" => properties }
           end
 
           def setup_write_environment(sync_config, action)
@@ -114,6 +117,11 @@ module Multiwoven
             authorize_client(sync_config.destination.connection_specification)
           end
 
+          def extract_spreadsheet_id(link)
+            link[GOOGLE_SPREADSHEET_ID_REGEX, 1] || link
+          end
+
+          # Batch has a limit of sending 2MB data. So creating a chunk of records to meet that limit
           def process_record_chunks(records, sync_config)
             write_success = 0
             write_failure = 0
@@ -130,6 +138,7 @@ module Multiwoven
             tracking_message(write_success, write_failure)
           end
 
+          # We need to format the data to adhere to google sheets API format. This converts the sync mapped data to 2D array format expected by google sheets API
           def prepare_chunk_values(chunk, stream)
             last_column_index = spread_sheet_value(stream.name).count
             fields = fetch_column_names(stream.name, last_column_index)
@@ -156,18 +165,6 @@ module Multiwoven
 
             # TODO: Remove & this is added for the test to pass we need
             @client&.batch_update_values(@spreadsheet_id, batch_update_request)
-          end
-
-          def extract_spreadsheet_id(link)
-            link[SPREADSHEET_ID_REGEX, 1] || link
-          end
-
-          def success_status
-            ConnectionStatus.new(status: ConnectionStatusType["succeeded"]).to_multiwoven_message
-          end
-
-          def failure_status(error)
-            ConnectionStatus.new(status: ConnectionStatusType["failed"], message: error.message).to_multiwoven_message
           end
 
           def load_catalog
