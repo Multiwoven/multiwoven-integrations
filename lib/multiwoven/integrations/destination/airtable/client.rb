@@ -22,7 +22,7 @@ module Multiwoven
               failure_status(nil)
             end
           rescue StandardError => e
-            failure_status(e.message)
+            failure_status(e)
           end
 
           def discover(connection_config)
@@ -107,7 +107,7 @@ module Multiwoven
           def base_id_exists?(bases, base_id)
             return if extract_data(bases).any? { |base| base["id"] == base_id }
 
-            raise ArgumentError, "Ad account not found in business account"
+            raise ArgumentError, "base_id not found"
           end
 
           def extract_bases(response)
