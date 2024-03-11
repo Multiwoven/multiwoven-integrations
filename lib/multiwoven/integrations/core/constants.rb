@@ -18,6 +18,8 @@ module Multiwoven
       SNOWFLAKE_DRIVER_PATH = ENV["SNOWFLAKE_DRIVER_PATH"] || SNOWFLAKE_MAC_DRIVER_PATH
       DATABRICKS_DRIVER_PATH = ENV["DATABRICKS_DRIVER_PATH"] || DATABRICKS_MAC_DRIVER_PATH
 
+      JSON_SCHEMA_URL = "https://json-schema.org/draft-07/schema#"
+
       # CONNECTORS
       KLAVIYO_AUTH_ENDPOINT = "https://a.klaviyo.com/api/lists/"
       KLAVIYO_AUTH_PAYLOAD = {

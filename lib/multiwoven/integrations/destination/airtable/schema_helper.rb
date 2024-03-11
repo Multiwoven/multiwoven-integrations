@@ -5,6 +5,8 @@ module Multiwoven
     module Destination
       module Airtable
         module SchemaHelper
+          include Core::Constants
+
           module_function
 
           def clean_name(name_str)
@@ -47,7 +49,7 @@ module Multiwoven
             end
 
             {
-              "$schema" => "https://json-schema.org/draft-07/schema#",
+              "$schema" => JSON_SCHEMA_URL,
               "type" => "object",
               "additionalProperties" => true,
               "properties" => properties
