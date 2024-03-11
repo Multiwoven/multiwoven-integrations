@@ -129,7 +129,7 @@ module Multiwoven
               name: "#{base_name}/#{SchemaHelper.clean_name(table["name"])}",
               action: "create",
               method: HTTP_POST,
-              url: "#{AIRTABLE_URL_BASE}#{base_id}/#{base_id}",
+              url: "#{AIRTABLE_URL_BASE}#{base_id}/#{table["id"]}",
               json_schema: SchemaHelper.get_json_schema(table),
               supported_sync_modes: %w[incremental],
               batch_support: true,

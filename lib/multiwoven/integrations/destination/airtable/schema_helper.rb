@@ -8,7 +8,7 @@ module Multiwoven
           module_function
 
           def clean_name(name_str)
-            name_str.gsub(" ", "_").downcase.strip
+            name_str.gsub(" ", "_").strip
           end
 
           def get_json_schema(table) # rubocop:disable Metrics/AbcSize,Metrics/PerceivedComplexity
