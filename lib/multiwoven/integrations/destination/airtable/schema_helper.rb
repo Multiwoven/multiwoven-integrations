@@ -12,11 +12,7 @@ module Multiwoven
           end
 
           def get_json_schema(table) # rubocop:disable Metrics/AbcSize,Metrics/PerceivedComplexity
-            properties = {
-              "_airtable_id" => SCHEMA_TYPES[:STRING],
-              "_airtable_created_time" => SCHEMA_TYPES[:STRING],
-              "_airtable_table_name" => SCHEMA_TYPES[:STRING]
-            }
+            properties = {}
 
             fields = table["fields"] || {}
             fields.each do |field|

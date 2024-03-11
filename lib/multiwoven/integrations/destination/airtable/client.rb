@@ -6,7 +6,8 @@ module Multiwoven
     module Destination
       module Airtable
         include Multiwoven::Integrations::Core
-        class Client < DestinationConnector
+        class Client < DestinationConnector # rubocop:disable Metrics/ClassLength
+          MAX_CHUNK_SIZE = 10
           def check_connection(connection_config)
             connection_config = connection_config.with_indifferent_access
             bases = Multiwoven::Integrations::Core::HttpClient.request(
@@ -35,7 +36,7 @@ module Multiwoven
               headers: auth_headers(api_key)
             )
 
-            base = extract_data(bases).find { |b| b["id"] == base_id }
+            base = extract_bases(bases).find { |b| b["id"] == base_id }
             base_name = base["name"]
 
             schema = Multiwoven::Integrations::Core::HttpClient.request(
@@ -44,20 +45,56 @@ module Multiwoven
               headers: auth_headers(api_key)
             )
 
-            catalog = build_catalog_from_schema(JSON.parse(schema.body), base_id, base_name)
+            catalog = build_catalog_from_schema(extract_body(schema), base_id, base_name)
             catalog.to_multiwoven_message
           rescue StandardError => e
             handle_exception("AIRTABLE:DISCOVER:EXCEPTION", "error", e)
           end
 
-          def write(_sync_config, _records, _action = "create")
-            # setup_write_environment(sync_config, action)
-            # process_record_chunks(records, sync_config)
+          def write(sync_config, records, _action = "create")
+            connection_config = sync_config.destination.connection_specification.with_indifferent_access
+            api_key = connection_config[:api_key]
+            url = sync_config.stream.url
+            write_success = 0
+            write_failure = 0
+            records.each_slice(MAX_CHUNK_SIZE) do |chunk|
+              payload = create_payload(chunk)
+              response = Multiwoven::Integrations::Core::HttpClient.request(
+                url,
+                sync_config.stream.request_method,
+                payload: payload,
+                headers: auth_headers(api_key)
+              )
+              if success?(response)
+                write_success += chunk.size
+              else
+                write_failure += chunk.size
+              end
+            rescue StandardError => e
+              handle_exception("AIRTABLE:RECORD:WRITE:EXCEPTION", "error", e)
+              write_failure += chunk.size
+            end
+
+            tracker = Multiwoven::Integrations::Protocol::TrackingMessage.new(
+              success: write_success,
+              failed: write_failure
+            )
+            tracker.to_multiwoven_message
           rescue StandardError => e
             handle_exception("AIRTABLE:WRITE:EXCEPTION", "error", e)
           end
 
           private
+
+          def create_payload(records)
+            {
+              "records" => records.map do |record|
+                {
+                  "fields" => record
+                }
+              end
+            }
+          end
 
           def auth_headers(access_token)
             {
@@ -73,9 +110,14 @@ module Multiwoven
             raise ArgumentError, "Ad account not found in business account"
           end
 
-          def extract_data(response)
+          def extract_bases(response)
+            response_body = extract_body(response)
+            response_body["bases"] if response_body
+          end
+
+          def extract_body(response)
             response_body = response.body
-            JSON.parse(response_body)["bases"] if response_body
+            JSON.parse(response_body) if response_body
           end
 
           def load_catalog
@@ -86,9 +128,10 @@ module Multiwoven
             {
               name: "#{base_name}/#{SchemaHelper.clean_name(table["name"])}",
               action: "create",
+              method: HTTP_POST,
+              url: "#{AIRTABLE_URL_BASE}#{base_id}/#{base_id}",
               json_schema: SchemaHelper.get_json_schema(table),
-              supported_sync_modes: %w[full_refresh incremental],
-              url: "#{AIRTABLE_URL_BASE}#{base_id}/#{table["name"]}",
+              supported_sync_modes: %w[incremental],
               batch_support: true,
               batch_size: 10
 
