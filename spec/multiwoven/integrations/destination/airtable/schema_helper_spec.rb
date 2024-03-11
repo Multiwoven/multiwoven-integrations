@@ -124,13 +124,13 @@ RSpec.describe Multiwoven::Integrations::Destination::Airtable::SchemaHelper do 
       "additionalProperties": true,
       "type": "object",
       "properties": {
-        "New_Name_1": {
+        "New_Name_1": { # rubocop:disable Naming/VariableNumber
           "type": %w[null string]
         },
-        "New_Formula_1": {
+        "New_Formula_1": { # rubocop:disable Naming/VariableNumber
           "type": %w[null number]
         },
-        "New_Formula_2": {
+        "New_Formula_2": { # rubocop:disable Naming/VariableNumber
           "items": {
             "type": %w[null string]
           },
