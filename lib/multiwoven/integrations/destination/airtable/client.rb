@@ -44,7 +44,6 @@ module Multiwoven
             )
 
             catalog = build_catalog_from_schema(JSON.parse(schema.body), base_id, base_name)
-            byebug
             catalog.to_multiwoven_message
           rescue StandardError => e
             handle_exception("AIRTABLE:DISCOVER:EXCEPTION", "error", e)
@@ -86,7 +85,7 @@ module Multiwoven
             {
               name: "#{base_name}/#{clean_name(table["name"])}",
               action: "create",
-              json_schema: get_json_schema(table).to_json,
+              json_schema: get_json_schema(table),
               supported_sync_modes: %w[full_refresh incremental],
               url: "#{AIRTABLE_URL_BASE}#{base_id}/#{table["name"]}",
               batch_support: true,
@@ -109,9 +108,9 @@ module Multiwoven
 
           def get_json_schema(table) # rubocop:disable Metrics/AbcSize,Metrics/PerceivedComplexity
             properties = {
-              "_airtable_id" => :STRING,
-              "_airtable_created_time" => :STRING,
-              "_airtable_table_name" => :STRING
+              "_airtable_id" => SCHEMA_TYPES[:STRING],
+              "_airtable_created_time" => SCHEMA_TYPES[:STRING],
+              "_airtable_table_name" => SCHEMA_TYPES[:STRING]
             }
 
             fields = table["fields"] || {}
@@ -166,43 +165,43 @@ module Multiwoven
           }.freeze
 
           SIMPLE_AIRTABLE_TYPES = {
-            "multipleAttachments" => :STRING,
-            "autoNumber" => :NUMBER,
-            "barcode" => :STRING,
-            "button" => :STRING,
+            "multipleAttachments" => SCHEMA_TYPES[:STRING],
+            "autoNumber" => SCHEMA_TYPES[:NUMBER],
+            "barcode" => SCHEMA_TYPES[:STRING],
+            "button" => SCHEMA_TYPES[:STRING],
             "checkbox" => :BOOLEAN,
-            "singleCollaborator" => :STRING,
-            "count" => :NUMBER,
-            "createdBy" => :STRING,
-            "createdTime" => :DATETIME,
-            "currency" => :NUMBER,
-            "email" => :STRING,
-            "date" => :DATE,
-            "dateTime" => :DATETIME,
-            "duration" => :NUMBER,
-            "lastModifiedBy" => :STRING,
-            "lastModifiedTime" => :DATETIME,
-            "multipleRecordLinks" => :ARRAY_WITH_STRINGS,
-            "multilineText" => :STRING,
-            "multipleCollaborators" => :ARRAY_WITH_STRINGS,
-            "multipleSelects" => :ARRAY_WITH_STRINGS,
-            "number" => :NUMBER,
-            "percent" => :NUMBER,
-            "phoneNumber" => :STRING,
-            "rating" => :NUMBER,
-            "richText" => :STRING,
-            "singleLineText" => :STRING,
-            "singleSelect" => :STRING,
-            "externalSyncSource" => :STRING,
-            "url" => :STRING,
-            "simpleText" => :STRING
+            "singleCollaborator" => SCHEMA_TYPES[:STRING],
+            "count" => SCHEMA_TYPES[:NUMBER],
+            "createdBy" => SCHEMA_TYPES[:STRING],
+            "createdTime" => SCHEMA_TYPES[:DATETIME],
+            "currency" => SCHEMA_TYPES[:NUMBER],
+            "email" => SCHEMA_TYPES[:STRING],
+            "date" => SCHEMA_TYPES[:DATE],
+            "dateTime" => SCHEMA_TYPES[:DATETIME],
+            "duration" => SCHEMA_TYPES[:NUMBER],
+            "lastModifiedBy" => SCHEMA_TYPES[:STRING],
+            "lastModifiedTime" => SCHEMA_TYPES[:DATETIME],
+            "multipleRecordLinks" => SCHEMA_TYPES[:ARRAY_WITH_STRINGS],
+            "multilineText" => SCHEMA_TYPES[:STRING],
+            "multipleCollaborators" => SCHEMA_TYPES[:ARRAY_WITH_STRINGS],
+            "multipleSelects" => SCHEMA_TYPES[:ARRAY_WITH_STRINGS],
+            "number" => SCHEMA_TYPES[:NUMBER],
+            "percent" => SCHEMA_TYPES[:NUMBER],
+            "phoneNumber" => SCHEMA_TYPES[:STRING],
+            "rating" => SCHEMA_TYPES[:NUMBER],
+            "richText" => SCHEMA_TYPES[:STRING],
+            "singleLineText" => SCHEMA_TYPES[:STRING],
+            "singleSelect" => SCHEMA_TYPES[:STRING],
+            "externalSyncSource" => SCHEMA_TYPES[:STRING],
+            "url" => SCHEMA_TYPES[:STRING],
+            "simpleText" => SCHEMA_TYPES[:STRING]
           }.freeze
 
           COMPLEX_AIRTABLE_TYPES = {
-            "formula" => :ARRAY_WITH_ANY,
-            "lookup" => :ARRAY_WITH_ANY,
-            "multipleLookupValues" => :ARRAY_WITH_ANY,
-            "rollup" => :ARRAY_WITH_ANY
+            "formula" => SCHEMA_TYPES[:ARRAY_WITH_ANY],
+            "lookup" => SCHEMA_TYPES[:ARRAY_WITH_ANY],
+            "multipleLookupValues" => SCHEMA_TYPES[:ARRAY_WITH_ANY],
+            "rollup" => SCHEMA_TYPES[:ARRAY_WITH_ANY]
           }.freeze
 
           ARRAY_FORMULAS = %w[ARRAYCOMPACT ARRAYFLATTEN ARRAYUNIQUE ARRAYSLICE].freeze
