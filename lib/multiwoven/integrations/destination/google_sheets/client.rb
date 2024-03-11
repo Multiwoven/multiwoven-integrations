@@ -97,7 +97,7 @@ module Multiwoven
               name: sheet_name,
               action: "create",
               batch_support: true,
-              batch_size: 10000,
+              batch_size: 10_000,
               json_schema: generate_properties_schema(column_names),
               supported_sync_modes: %w[incremental]
             }.with_indifferent_access
