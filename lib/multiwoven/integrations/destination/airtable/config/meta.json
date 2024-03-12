@@ -4,7 +4,7 @@
     "title": "airtable",
     "connector_type": "destination",
     "category": "Productivity Tools",
-    "documentation_url": "https://docs.mutliwoven.com",
+    "documentation_url": "https://docs.multiwoven.com/destinations/productivity-tools/airtable",
     "github_issue_label": "destination-airtable",
     "icon": "icon.svg",
     "license": "MIT",

@@ -43,8 +43,6 @@ module Multiwoven
       HTTP_PUT = "PUT"
       HTTP_DELETE = "DELETE"
 
-      JSON_SCHEMA_URL = "http://json-schema.org/draft-07/schema#"
-
       # google sheets
       GOOGLE_SHEETS_SCOPE = "https://www.googleapis.com/auth/drive"
       GOOGLE_SPREADSHEET_ID_REGEX = %r{/d/([-\w]{20,})/}.freeze
