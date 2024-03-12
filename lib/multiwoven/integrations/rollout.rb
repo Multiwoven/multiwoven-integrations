@@ -18,6 +18,7 @@ module Multiwoven
       FacebookCustomAudience
       Slack
       Hubspot
+      Airtable
     ].freeze
   end
 end

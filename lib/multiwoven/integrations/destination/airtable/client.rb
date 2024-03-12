@@ -141,7 +141,7 @@ module Multiwoven
           def build_catalog_from_schema(schema, base_id, base_name)
             catalog = build_catalog(load_catalog)
             schema["tables"].each do |table|
-              catalog.streams << create_stream(table, base_id, base_name)
+              catalog.streams << build_stream(create_stream(table, base_id, base_name))
             end
             catalog
           end

@@ -13,47 +13,74 @@ module Multiwoven
             name_str.strip.gsub(" ", "_")
           end
 
-          def get_json_schema(table) # rubocop:disable Metrics/AbcSize,Metrics/PerceivedComplexity
-            properties = {}
-
+          def get_json_schema(table)
             fields = table["fields"] || {}
-            fields.each do |field|
-              name = clean_name(field.fetch("name", ""))
-              original_type = field.fetch("type", "")
-              options = field.fetch("options", {})
-              options_result = options.fetch("result", {})
-              exec_type = options_result["type"] unless options_result.empty?
-
-              if COMPLEX_AIRTABLE_TYPES.keys.include?(original_type)
-                complex_type = Marshal.load(Marshal.dump(COMPLEX_AIRTABLE_TYPES[original_type]))
-
-                field_type = exec_type || "simpleText"
-                if complex_type == SCHEMA_TYPES[:ARRAY_WITH_ANY]
-                  if original_type == "formula" && %w[number currency percent duration].include?(field_type)
-                    complex_type = SCHEMA_TYPES[:NUMBER]
-                  elsif original_type == "formula" && ARRAY_FORMULAS.none? { |x| options.fetch("formula", "").start_with?(x) }
-                    complex_type = SCHEMA_TYPES[:STRING]
-                  elsif SIMPLE_AIRTABLE_TYPES.keys.include?(field_type)
-                    complex_type["items"] = Marshal.load(Marshal.dump(SIMPLE_AIRTABLE_TYPES[field_type]))
-                  else
-                    complex_type["items"] = SCHEMA_TYPES[:STRING]
-                  end
-                end
-                properties[name] = complex_type
-              elsif SIMPLE_AIRTABLE_TYPES.keys.include?(original_type)
-                field_type = exec_type || original_type
-                properties[name] = Marshal.load(Marshal.dump(SIMPLE_AIRTABLE_TYPES[field_type]))
-              else
-                properties[name] = SCHEMA_TYPES[:STRING]
-              end
+            properties = fields.each_with_object({}) do |field, props|
+              name, schema = process_field(field)
+              props[name] = schema
             end
 
+            build_schema(properties)
+          end
+
+          def process_field(field)
+            name = clean_name(field.fetch("name", ""))
+            original_type = field.fetch("type", "")
+            options = field.fetch("options", {})
+
+            schema = determine_schema(original_type, options)
+            [name, schema]
+          end
+
+          def determine_schema(original_type, options)
+            if COMPLEX_AIRTABLE_TYPES.keys.include?(original_type)
+              complex_type = deep_copy(COMPLEX_AIRTABLE_TYPES[original_type])
+              adjust_complex_type(original_type, complex_type, options)
+            elsif SIMPLE_AIRTABLE_TYPES.keys.include?(original_type)
+              simple_type_schema(original_type, options)
+            else
+              SCHEMA_TYPES[:STRING]
+            end
+          end
+
+          def adjust_complex_type(original_type, complex_type, options)
+            exec_type = options.dig("result", "type") || "simpleText"
+            if complex_type == SCHEMA_TYPES[:ARRAY_WITH_ANY]
+              adjust_array_with_any(original_type, complex_type, exec_type, options)
+            else
+              complex_type
+            end
+          end
+
+          def adjust_array_with_any(original_type, complex_type, exec_type, options)
+            if original_type == "formula" && %w[number currency percent duration].include?(exec_type)
+              complex_type = SCHEMA_TYPES[:NUMBER]
+            elsif original_type == "formula" && ARRAY_FORMULAS.none? { |x| options.fetch("formula", "").start_with?(x) }
+              complex_type = SCHEMA_TYPES[:STRING]
+            elsif SIMPLE_AIRTABLE_TYPES.keys.include?(exec_type)
+              complex_type["items"] = deep_copy(SIMPLE_AIRTABLE_TYPES[exec_type])
+            else
+              complex_type["items"] = SCHEMA_TYPES[:STRING]
+            end
+            complex_type
+          end
+
+          def simple_type_schema(original_type, options)
+            exec_type = options.dig("result", "type") || original_type
+            deep_copy(SIMPLE_AIRTABLE_TYPES[exec_type])
+          end
+
+          def build_schema(properties)
             {
               "$schema" => JSON_SCHEMA_URL,
               "type" => "object",
               "additionalProperties" => true,
               "properties" => properties
             }
+          end
+
+          def deep_copy(object)
+            Marshal.load(Marshal.dump(object))
           end
 
           SCHEMA_TYPES = {
