@@ -34,6 +34,23 @@ module Multiwoven
             handle_exception("GOOGLE_SHEETS:CRM:WRITE:EXCEPTION", "error", e)
           end
 
+          def clear_all_records(sync_config)
+            setup_write_environment(sync_config, "clear")
+
+            spreadsheet = @client.get_spreadsheet(@spreadsheet_id)
+            sheet_ids = spreadsheet.sheets.map(&:properties).map(&:sheet_id)
+
+            delete_extra_sheets(sheet_ids)
+
+            unless sheet_ids.empty?
+              clear_sheet_data(spreadsheet.sheets.first.properties.title)
+              return control_message("Data cleared successfully.", "succeeded")
+            end
+            control_message("Data cleared Failed.", "failed")
+          rescue StandardError => e
+            control_message(e.message, "failed")
+          end
+
           private
 
           # To define the level of access granted to your app, you need to identify and declare authorization scopes which is provided by google scopse https://developers.google.com/sheets/api/scopes
@@ -99,7 +116,7 @@ module Multiwoven
               batch_support: true,
               batch_size: 10_000,
               json_schema: generate_properties_schema(column_names),
-              supported_sync_modes: %w[incremental]
+              supported_sync_modes: %w[incremental full_refresh]
             }.with_indifferent_access
           end
 
@@ -174,6 +191,31 @@ module Multiwoven
           def tracking_message(success, failure)
             Multiwoven::Integrations::Protocol::TrackingMessage.new(
               success: success, failed: failure
+            ).to_multiwoven_message
+          end
+
+          def delete_extra_sheets(sheet_ids)
+            # Leave one sheet intact as a spreadsheet must have at least one sheet.
+            # Delete all other sheets.
+            (sheet_ids.length - 1).times do |i|
+              request = Google::Apis::SheetsV4::BatchUpdateSpreadsheetRequest.new(
+                requests: [{ delete_sheet: { sheet_id: sheet_ids[i + 1] } }]
+              )
+              @client.batch_update_spreadsheet(@spreadsheet_id, request)
+            end
+          end
+
+          def clear_sheet_data(sheet_title)
+            clear_request = Google::Apis::SheetsV4::ClearValuesRequest.new
+            @client.clear_values(@spreadsheet_id, "#{sheet_title}!A:Z", clear_request)
+          end
+
+          def control_message(message, status)
+            ControlMessage.new(
+              type: "full_refresh",
+              emitted_at: Time.now.to_i,
+              status: ConnectionStatusType[status],
+              meta: { detail: message }
             ).to_multiwoven_message
           end
         end
