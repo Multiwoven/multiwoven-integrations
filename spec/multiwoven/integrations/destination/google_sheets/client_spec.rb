@@ -109,7 +109,6 @@ RSpec.describe Multiwoven::Integrations::Destination::GoogleSheets::Client do # 
 
   before do
     allow(client).to receive(:authorize_client).and_return(true)
-
     color = Google::Apis::SheetsV4::Color.new(red: 1, green: 1, blue: 1)
     color_style = Google::Apis::SheetsV4::ColorStyle.new(rgb_color: color)
     cell_format = Google::Apis::SheetsV4::CellFormat.new(
@@ -148,6 +147,7 @@ RSpec.describe Multiwoven::Integrations::Destination::GoogleSheets::Client do # 
     )
 
     sheet_properties = Google::Apis::SheetsV4::SheetProperties.new(
+      sheet_id: 12_345,
       title: "osssoft",
       grid_properties: Google::Apis::SheetsV4::GridProperties.new(row_count: 1000, column_count: 2)
     )
@@ -224,7 +224,6 @@ RSpec.describe Multiwoven::Integrations::Destination::GoogleSheets::Client do # 
           total_updated_rows: 2,
           total_updated_sheets: 1
         )
-
         @client = Google::Apis::SheetsV4::SheetsService.new
         allow(@client).to receive(:batch_update_values)
           .with(@spreadsheet_id, an_instance_of(Google::Apis::SheetsV4::BatchUpdateValuesRequest))
@@ -284,5 +283,32 @@ RSpec.describe Multiwoven::Integrations::Destination::GoogleSheets::Client do # 
     Multiwoven::Integrations::Protocol::SyncConfig.from_json(
       sync_config_json.to_json
     )
+  end
+  describe "#clear_all_records" do
+    context "when clearing all records is successful" do
+      it "clears data from the first sheet and deletes extra sheets" do
+        response = client.clear_all_records(sync_config)
+        expect(response).to be_instance_of(Multiwoven::Integrations::Protocol::MultiwovenMessage)
+        expect(response.control.status).to eq("succeeded")
+        expect(response.control.meta[:detail]).to include("Successfully cleared data")
+      end
+    end
+
+    context "when there is an error clearing records" do
+      it "returns a failure status in delete_extra_sheets" do
+        allow(client).to receive(:delete_extra_sheets).and_raise(StandardError.new("Test Error"))
+        response = client.clear_all_records(sync_config)
+        expect(response).to be_instance_of(Multiwoven::Integrations::Protocol::MultiwovenMessage)
+        expect(response.control.status).to eq("failed")
+        expect(response.control.meta[:detail]).to include("Test Error")
+      end
+      it "returns a failure status in clear_sheet_data" do
+        allow(client).to receive(:clear_sheet_data).and_raise(StandardError.new("Test Error"))
+        response = client.clear_all_records(sync_config)
+        expect(response).to be_instance_of(Multiwoven::Integrations::Protocol::MultiwovenMessage)
+        expect(response.control.status).to eq("failed")
+        expect(response.control.meta[:detail]).to include("Test Error")
+      end
+    end
   end
 end
