@@ -41,7 +41,7 @@ RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudience::Cl
       "stream": {
         "name": "audience", "action": "create",
         "json_schema": facebook_audience_json_schema,
-        "supported_sync_modes": %w[full_refresh incremental],
+        "supported_sync_modes": %w[incremental],
         "source_defined_cursor": true,
         "default_cursor_field": ["field1"],
         "source_defined_primary_key": [["field1"], ["field2"]],
@@ -101,7 +101,7 @@ RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudience::Cl
       expect(audience_stream.request_method).to eql("POST")
       expect(audience_stream.batch_support).to eql(true)
       expect(audience_stream.batch_size).to eql(10_000)
-      expect(audience_stream.supported_sync_modes).to match_array(%w[full_refresh incremental])
+      expect(audience_stream.supported_sync_modes).to match_array(%w[incremental])
     end
   end
 
