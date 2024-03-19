@@ -4,6 +4,7 @@ module Multiwoven
   module Integrations::Core
     class DestinationConnector < BaseConnector
       prepend Fullrefresher
+      prepend RateLimiter
 
       # Records are transformed json payload send it to the destination
       # SyncConfig is the Protocol::SyncConfig object

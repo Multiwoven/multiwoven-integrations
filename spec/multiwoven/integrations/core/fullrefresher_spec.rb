@@ -14,6 +14,7 @@ RSpec.describe Multiwoven::Integrations::Core::Fullrefresher do
   let(:refresher_class) do
     Class.new do
       prepend Multiwoven::Integrations::Core::Fullrefresher
+      prepend Multiwoven::Integrations::Core::RateLimiter
 
       def write(sync_config, _records, _action = "insert")
         Multiwoven::Integrations::Service.logger.info("Original write called stream_name: #{sync_config.stream.name}")

@@ -3,7 +3,6 @@
 module Multiwoven
   module Integrations::Core
     module Fullrefresher
-      prepend RateLimiter
       def write(sync_config, records, action = "insert")
         if sync_config && sync_config.sync_mode == "full_refresh" && !@full_refreshed
           response = clear_all_records(sync_config)
