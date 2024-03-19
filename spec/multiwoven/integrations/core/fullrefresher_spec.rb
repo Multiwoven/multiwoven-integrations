@@ -31,7 +31,7 @@ RSpec.describe Multiwoven::Integrations::Core::Fullrefresher do
     end.new
   end
 
-  let(:refresher_class_clear_fail) do
+  let(:failed_refresher) do
     Class.new do
       prepend Multiwoven::Integrations::Core::Fullrefresher
 
@@ -56,7 +56,7 @@ RSpec.describe Multiwoven::Integrations::Core::Fullrefresher do
       it "calls clear_all_records before super method" do
         expected_write_message = "Original write called stream_name: #{stream.name}"
         expect(Multiwoven::Integrations::Service.logger).to receive(:info).with(expected_write_message)
-
+        expect(refresher_class).to receive(:clear_all_records).with(sync_config_full_refresh).once.and_call_original
         refresher_class.write(sync_config_full_refresh, records)
       end
     end
@@ -70,27 +70,28 @@ RSpec.describe Multiwoven::Integrations::Core::Fullrefresher do
       end
 
       it "it calls clear_all_records and clear failed" do
-        response = refresher_class_clear_fail.write(sync_config_full_refresh, records)
+        expect(refresher_class).not_to receive(:clear_all_records).with(sync_config_full_refresh)
+        response = failed_refresher.write(sync_config_full_refresh, records)
         expect(response).to be_instance_of(Multiwoven::Integrations::Protocol::MultiwovenMessage)
         expect(response.control.status).to eq("failed")
       end
     end
 
     context "when sync_mode is incremental" do
-      it "should not calling clear_all_records" do
+      it "incremental with refresher_class not calling clear_all_records" do
         expected_write_message = "Original write called stream_name: #{stream.name}"
         allow(Multiwoven::Integrations::Service.logger).to receive(:info)
         expect(Multiwoven::Integrations::Service.logger).to receive(:info).with(expected_write_message)
-
+        expect(refresher_class).not_to receive(:clear_all_records).with(sync_config_incremental)
         refresher_class.write(sync_config_incremental, records)
       end
 
-      it "should not calling clear_all_records" do
+      it "incremental with failed_refresher not calling clear_all_records" do
         expected_write_message = "Original write called stream_name: #{stream.name}"
         allow(Multiwoven::Integrations::Service.logger).to receive(:info)
         expect(Multiwoven::Integrations::Service.logger).to receive(:info).with(expected_write_message)
-
-        refresher_class_clear_fail.write(sync_config_incremental, records)
+        expect(refresher_class).not_to receive(:clear_all_records).with(sync_config_incremental)
+        failed_refresher.write(sync_config_incremental, records)
       end
     end
   end

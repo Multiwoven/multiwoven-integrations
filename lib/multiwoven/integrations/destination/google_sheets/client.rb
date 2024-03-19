@@ -42,9 +42,10 @@ module Multiwoven
             delete_extra_sheets(sheet_ids)
 
             unless sheet_ids.empty?
-              clear_sheet_data(spreadsheet.sheets.first.properties.title)
-              return control_message("Successfully cleared data.", "succeeded")
+              clear_response = clear_sheet_data(spreadsheet.sheets.first.properties.title)
+              return control_message("Successfully cleared data.", "succeeded") if clear_response&.cleared_range
             end
+
             control_message("Failed to clear data.", "failed")
           rescue StandardError => e
             control_message(e.message, "failed")

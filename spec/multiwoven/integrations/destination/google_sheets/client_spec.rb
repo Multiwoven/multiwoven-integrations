@@ -287,6 +287,10 @@ RSpec.describe Multiwoven::Integrations::Destination::GoogleSheets::Client do # 
   describe "#clear_all_records" do
     context "when clearing all records is successful" do
       it "clears data from the first sheet and deletes extra sheets" do
+        expected_cleared_range = "test1!A1:Z1000"
+        mock_clear_request = double(Google::Apis::SheetsV4::ClearValuesResponse)
+        allow(mock_clear_request).to receive(:cleared_range).and_return(expected_cleared_range)
+        allow(client).to receive(:clear_sheet_data).and_return(mock_clear_request)
         response = client.clear_all_records(sync_config)
         expect(response).to be_instance_of(Multiwoven::Integrations::Protocol::MultiwovenMessage)
         expect(response.control.status).to eq("succeeded")

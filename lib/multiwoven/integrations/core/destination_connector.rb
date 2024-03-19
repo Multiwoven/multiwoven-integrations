@@ -17,6 +17,7 @@ module Multiwoven
       def clear_all_records(_sync_config)
         # Logic to clear all records at the destination
         # implementation needed to support full_refresh sync mode.
+        # Return type is ControlMessage < ProtocolModel
         raise "Not implemented clear_all_records"
       end
     end
