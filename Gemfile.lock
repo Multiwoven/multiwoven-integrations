@@ -14,6 +14,7 @@ PATH
       dry-struct
       dry-types
       git
+      google-apis-sheets_v4
       google-cloud-bigquery
       hubspot-api-client
       pg
@@ -23,6 +24,7 @@ PATH
       ruby-odbc
       sequel
       slack-ruby-client
+      stripe
 
 GEM
   remote: https://rubygems.org/
