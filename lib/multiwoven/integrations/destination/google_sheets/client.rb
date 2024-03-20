@@ -10,6 +10,7 @@ module Multiwoven
           MAX_CHUNK_SIZE = 10_000
 
           def check_connection(connection_config)
+            connection_config = connection_config.with_indifferent_access
             authorize_client(connection_config)
             fetch_google_spread_sheets(connection_config)
             success_status
@@ -19,6 +20,7 @@ module Multiwoven
           end
 
           def discover(connection_config)
+            connection_config = connection_config.with_indifferent_access
             authorize_client(connection_config)
             spreadsheets = fetch_google_spread_sheets(connection_config)
             catalog = build_catalog_from_spreadsheets(spreadsheets, connection_config)
@@ -36,7 +38,8 @@ module Multiwoven
 
           def clear_all_records(sync_config)
             setup_write_environment(sync_config, "clear")
-            spreadsheet = fetch_google_spread_sheets(sync_config.destination.connection_specification)
+            connection_specification = sync_config.destination.connection_specification.with_indifferent_access
+            spreadsheet = fetch_google_spread_sheets(connection_specification)
             sheet_ids = spreadsheet.sheets.map(&:properties).map(&:sheet_id)
 
             delete_extra_sheets(sheet_ids)
@@ -130,8 +133,9 @@ module Multiwoven
 
           def setup_write_environment(sync_config, action)
             @action = sync_config.stream.action || action
-            @spreadsheet_id = extract_spreadsheet_id(sync_config.destination.connection_specification[:spreadsheet_link])
-            authorize_client(sync_config.destination.connection_specification)
+            connection_specification = sync_config.destination.connection_specification.with_indifferent_access
+            @spreadsheet_id = extract_spreadsheet_id(connection_specification[:spreadsheet_link])
+            authorize_client(connection_specification)
           end
 
           def extract_spreadsheet_id(link)
@@ -207,7 +211,7 @@ module Multiwoven
 
           def clear_sheet_data(sheet_title)
             clear_request = Google::Apis::SheetsV4::ClearValuesRequest.new
-            @client&.clear_values(@spreadsheet_id, "#{sheet_title}!A:Z", clear_request)
+            @client&.clear_values(@spreadsheet_id, "#{sheet_title}!A2:Z", clear_request)
           end
 
           def control_message(message, status)
