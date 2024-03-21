@@ -47,7 +47,9 @@ RSpec.describe Multiwoven::Integrations::Destination::FacebookCustomAudience::Cl
         "source_defined_primary_key": [["field1"], ["field2"]],
         "namespace": "exampleNamespace",
         "url": "https://graph.facebook.com/v18.0/#{audience_id}/users",
-        "request_method": "POST"
+        "request_method": "POST",
+        "request_rate_limit": 4,
+        "rate_limit_unit_seconds": 1
       },
       "sync_mode": "full_refresh",
       "cursor_field": "timestamp",

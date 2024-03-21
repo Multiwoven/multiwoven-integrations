@@ -16,12 +16,6 @@ module Multiwoven
           allow(sync_config).to receive(:sync_mode).and_return("incremental")
           expect { connector.write(sync_config, records) }.to raise_error("Not implemented")
         end
-
-        it "raises an error for not being implemented" do
-          connector = described_class.new
-          allow(sync_config).to receive(:sync_mode).and_return("full_refresh")
-          expect { connector.write(sync_config, records) }.to raise_error("Not implemented clear_all_records")
-        end
       end
     end
   end

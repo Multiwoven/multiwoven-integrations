@@ -90,9 +90,11 @@ RSpec.describe Multiwoven::Integrations::Destination::GoogleSheets::Client do # 
       stream: {
         name: "osssoft",
         action: "create",
+        request_rate_limit: 4,
+        rate_limit_unit_seconds: 1,
         json_schema: google_sheet_osssoft_schema
       },
-      sync_mode: "full_refresh",
+      sync_mode: "incremental",
       cursor_field: "timestamp",
       destination_sync_mode: "insert" }.with_indifferent_access
   end

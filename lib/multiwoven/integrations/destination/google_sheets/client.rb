@@ -7,6 +7,8 @@ module Multiwoven
         include Multiwoven::Integrations::Core
 
         class Client < DestinationConnector # rubocop:disable Metrics/ClassLength
+          prepend Multiwoven::Integrations::Core::Fullrefresher
+          prepend Multiwoven::Integrations::Core::RateLimiter
           MAX_CHUNK_SIZE = 10_000
 
           def check_connection(connection_config)
