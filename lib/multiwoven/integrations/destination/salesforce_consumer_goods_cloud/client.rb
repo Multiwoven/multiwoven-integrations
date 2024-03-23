@@ -25,7 +25,7 @@ module Multiwoven
             catalog = build_catalog(load_catalog)
             catalog.to_multiwoven_message
           rescue StandardError => e
-            handle_exception("SALESFORCE:CRM:DISCOVER:EXCEPTION", "error", e)
+            handle_exception("SALESFORCE:CONSUMER:GOODS:ClOUD:DISCOVER:EXCEPTION", "error", e)
           end
 
           def write(sync_config, records, action = "create")
@@ -33,7 +33,7 @@ module Multiwoven
             initialize_client(sync_config.destination.connection_specification)
             process_records(records, sync_config.stream)
           rescue StandardError => e
-            handle_exception("SALESFORCE:CRM:WRITE:EXCEPTION", "error", e)
+            handle_exception("SALESFORCE:CONSUMER:GOODS:ClOUD:WRITE:EXCEPTION", "error", e)
           end
 
           private
@@ -58,7 +58,7 @@ module Multiwoven
               process_record(stream, record)
               write_success += 1
             rescue StandardError => e
-              handle_exception("SALESFORCE:CRM:WRITE:EXCEPTION", "error", e)
+              handle_exception("SALESFORCE:CONSUMER:GOODS:ClOUD:WRITE:EXCEPTION", "error", e)
               write_failure += 1
             end
             tracking_message(write_success, write_failure)

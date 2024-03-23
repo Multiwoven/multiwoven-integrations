@@ -32,7 +32,7 @@ RSpec.describe Multiwoven::Integrations::Destination::SalesforceConsumerGoodsClo
         }
       },
       destination: {
-        name: "Salesforce CRM",
+        name: "Salesforce Consumer Goods Cloud",
         type: "destination",
         connection_specification: connection_config
       },
