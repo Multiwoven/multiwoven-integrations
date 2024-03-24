@@ -4,6 +4,7 @@ module Multiwoven::Integrations::Destination
   module Sftp
     include Multiwoven::Integrations::Core
     class Client < DestinationConnector
+      prepend Multiwoven::Integrations::Core::Fullrefresher
       prepend Multiwoven::Integrations::Core::RateLimiter
 
       def check_connection(connection_config)
@@ -44,7 +45,7 @@ module Multiwoven::Integrations::Destination
           sftp.file.open(file_path, "w") { |file| file.puts(csv_content) }
           write_success += records.size
         rescue StandardError => e
-          handle_exception("FACEBOOK:RECORD:WRITE:EXCEPTION", "error", e)
+          handle_exception("SFTP:RECORD:WRITE:EXCEPTION", "error", e)
           write_failure += records.size
         end
         tracking_message(write_success, write_failure)
@@ -64,10 +65,11 @@ module Multiwoven::Integrations::Destination
           files.each do |file|
             sftp.remove!(File.join(connection_specification[:destination_path], file.name))
           end
-
-          return control_message("Successfully cleared data.", "succeeded") if sftp.dir.entries(connection_specification[:destination_path]).size == 2
-
-          return control_message("Failed to clear data.", "failed")
+          if sftp.dir.entries(connection_specification[:destination_path]).size == 2
+            control_message("Successfully cleared data.", "succeeded")
+          else
+            control_message("Failed to clear data.", "failed")
+          end
         end
       rescue StandardError => e
         control_message(e.message, "failed")
