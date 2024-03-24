@@ -56,6 +56,7 @@ module Multiwoven
           private
 
           def query(connection, query)
+            exclude_keys = ["attributes"]
             queried_data = connection.query(query)
             results = queried_data.map do |record|
               record.reject { |key, _| exclude_keys.include?(key) }
