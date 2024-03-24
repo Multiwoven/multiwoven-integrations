@@ -64,9 +64,9 @@ RSpec.describe Multiwoven::Integrations::Source::SalesforceConsumerGoodsCloud::C
         "additionalProperties" => true,
         "properties" => {
           "Id" => { "type" => "string" },
-          "Username" => { "type" => "string" },
-        },
-      },
+          "Username" => { "type" => "string" }
+        }
+      }
     }
   end
 
@@ -81,28 +81,28 @@ RSpec.describe Multiwoven::Integrations::Source::SalesforceConsumerGoodsCloud::C
         "additionalProperties" => true,
         "properties" => {
           "Id" => { "type" => "string" },
-          "Name" => { "type" => ["string", "null"] },
-        },
-      },
+          "Name" => { "type" => %w[string null] }
+        }
+      }
     }
   end
 
   let(:sample_account_description) do
     {
-      'name' => 'Account',
-      'fields' => [
-        { 'name' => 'Id', 'type' => 'string' },
-        { 'name' => 'Name', 'type' => 'string' },
+      "name" => "Account",
+      "fields" => [
+        { "name" => "Id", "type" => "string" },
+        { "name" => "Name", "type" => "string" }
       ]
     }
   end
-  
+
   let(:sample_user_description) do
     {
-      'name' => 'User',
-      'fields' => [
-        { 'name' => 'Id', 'type' => 'string' },
-        { 'name' => 'Username', 'type' => 'string' },
+      "name" => "User",
+      "fields" => [
+        { "name" => "Id", "type" => "string" },
+        { "name" => "Username", "type" => "string" }
       ]
     }
   end
@@ -139,29 +139,29 @@ RSpec.describe Multiwoven::Integrations::Source::SalesforceConsumerGoodsCloud::C
 
   describe "#read" do
     context "when read is successful" do
-      it 'returns an array of MultiwovenMessages with RecordMessages' do
+      it "returns an array of MultiwovenMessages with RecordMessages" do
         allow(client).to receive(:initialize_client)
         allow(client).to receive(:@client).and_return(double)
 
-        sobject_1 = Restforce::SObject.new('Id' => '1', 'Name' => 'Random COMPANY')
-        sobject_2 = Restforce::SObject.new('Id' => '2', 'Name' => 'Random COMPANY 2')
-        query_result = [sobject_1, sobject_2]
+        sobject_one = Restforce::SObject.new("Id" => "1", "Name" => "Random COMPANY")
+        sobject_two = Restforce::SObject.new("Id" => "2", "Name" => "Random COMPANY 2")
+        query_result = [sobject_one, sobject_two]
 
         allow(client.instance_variable_get(:@client)).to receive(:query).and_return(query_result)
 
         results = client.read(sync_config)
 
         expect(results).to all(be_a(Multiwoven::Integrations::Protocol::MultiwovenMessage))
-        expect(results[0].record.data).to eq(sobject_1)
-        expect(results[1].record.data).to eq(sobject_2)
+        expect(results[0].record.data).to eq(sobject_one)
+        expect(results[1].record.data).to eq(sobject_two)
       end
     end
 
     context "when read fails" do
-      it 'handles exceptions' do
+      it "handles exceptions" do
         allow(client).to receive(:initialize_client)
         allow(client).to receive(:@client).and_return(double)
-        allow(client.instance_variable_get(:@client)).to receive(:query).and_raise(StandardError.new('Read failed'))
+        allow(client.instance_variable_get(:@client)).to receive(:query).and_raise(StandardError.new("Read failed"))
 
         expect { client.read(sync_config) }.to_not raise_error
       end
@@ -175,30 +175,30 @@ RSpec.describe Multiwoven::Integrations::Source::SalesforceConsumerGoodsCloud::C
     end
   end
 
-  describe '#discover' do
-    context 'when discovery is successful' do
-      it 'returns a MultiwovenMessage with the expected catalog structure' do
+  describe "#discover" do
+    context "when discovery is successful" do
+      it "returns a MultiwovenMessage with the expected catalog structure" do
         allow(client).to receive(:initialize_client).with(connection_config.with_indifferent_access)
         allow(client).to receive(:load_catalog).and_return({ streams: [] })
 
-        restforce_client_double = double('Restforce client')
+        restforce_client_double = double("Restforce client")
         allow(client).to receive(:@client).and_return(restforce_client_double)
-        
-        allow(@client).to receive(:describe).with('Account').and_return(sample_account_description)
-        allow(@client).to receive(:describe).with('User').and_return(sample_user_description)
+
+        allow(@client).to receive(:describe).with("Account").and_return(sample_account_description)
+        allow(@client).to receive(:describe).with("User").and_return(sample_user_description)
 
         allow(client).to receive(:create_json_schema_for_object).and_return(sample_account_schema, sample_user_schema)
 
         result = client.discover(connection_config)
         expect(result).to be_a(Multiwoven::Integrations::Protocol::MultiwovenMessage)
-        expect(result.type).to eq('catalog')
+        expect(result.type).to eq("catalog")
       end
     end
 
-    context 'when discovery fails' do
-      it 'handles exceptions' do
+    context "when discovery fails" do
+      it "handles exceptions" do
         allow(client).to receive(:initialize_client).with(connection_config.with_indifferent_access)
-        allow(client).to receive(:load_catalog).and_raise(StandardError.new('Discovery failed'))
+        allow(client).to receive(:load_catalog).and_raise(StandardError.new("Discovery failed"))
 
         expect { client.discover(connection_config) }.to_not raise_error
       end
