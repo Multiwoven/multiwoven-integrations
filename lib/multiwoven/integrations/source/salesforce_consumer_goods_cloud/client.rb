@@ -25,7 +25,7 @@ module Multiwoven
           def discover(connection_config)
             connection_config = connection_config.with_indifferent_access
             initialize_client(connection_config)
-            catalog = build_catalog(load_catalog)
+            catalog = build_catalog(load_catalog.with_indifferent_access)
             streams = catalog[:streams]
             SALESFORCE_OBJECTS.each do |object|
               object_description = @client.describe(object)
