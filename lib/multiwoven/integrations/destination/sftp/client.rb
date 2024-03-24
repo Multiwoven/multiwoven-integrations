@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "net/sftp"
-require "csv"
-require "securerandom"
 module Multiwoven::Integrations::Destination
   module Sftp
     include Multiwoven::Integrations::Core
@@ -59,6 +56,23 @@ module Multiwoven::Integrations::Destination
         )
       end
 
+      def clear_all_records(sync_config)
+        connection_specification = sync_config.destination.connection_specification.with_indifferent_access
+        with_sftp_client(connection_specification) do |sftp|
+          files = sftp.dir.glob(connection_specification[:destination_path], "*")
+
+          files.each do |file|
+            sftp.remove!(File.join(connection_specification[:destination_path], file.name))
+          end
+
+          return control_message("Successfully cleared data.", "succeeded") if sftp.dir.entries(connection_specification[:destination_path]).size == 2
+
+          return control_message("Failed to clear data.", "failed")
+        end
+      rescue StandardError => e
+        control_message(e.message, "failed")
+      end
+
       private
 
       def generate_file_path(sync_config)
@@ -93,6 +107,15 @@ module Multiwoven::Integrations::Destination
       def test_file_operations(sftp, test_path)
         sftp.file.open(test_path, "w") { |file| file.puts("connection_check") }
         sftp.remove!(test_path)
+      end
+
+      def control_message(message, status)
+        ControlMessage.new(
+          type: "full_refresh",
+          emitted_at: Time.now.to_i,
+          status: ConnectionStatusType[status],
+          meta: { detail: message }
+        ).to_multiwoven_message
       end
     end
   end
