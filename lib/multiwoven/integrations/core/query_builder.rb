@@ -3,7 +3,7 @@
 module Multiwoven
   module Integrations::Core
     class QueryBuilder
-      def self.perform(action, table, primary_key, record)
+      def self.perform(action, table, record, primary_key = nil)
         case action.downcase
         when "create"
           columns = record.keys.join(", ")

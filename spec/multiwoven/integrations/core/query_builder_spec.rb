@@ -10,7 +10,7 @@ RSpec.describe Multiwoven::Integrations::Core::QueryBuilder do
       let(:primary_key) { "" } # Not used in creation
 
       it "generates a correct INSERT SQL query" do
-        query = described_class.perform(action, table, primary_key, params)
+        query = described_class.perform(action, table, params, primary_key)
         expect(query).to eq("INSERT INTO users (email, name) VALUES ('user@example.com', 'John Doe');")
       end
     end
@@ -23,7 +23,7 @@ RSpec.describe Multiwoven::Integrations::Core::QueryBuilder do
         let(:params) { { "user_id" => "1", "location" => "New York" } }
 
         it "generates a correct UPDATE SQL query excluding the primary key from SET clause" do
-          query = described_class.perform(action, table, primary_key, params)
+          query = described_class.perform(action, table, params, primary_key)
           expect(query).to eq("UPDATE users SET location = 'New York' WHERE user_id = '1';")
         end
       end
@@ -33,7 +33,7 @@ RSpec.describe Multiwoven::Integrations::Core::QueryBuilder do
         let(:params) { { "location" => "New York" } }
 
         it "returns an error message" do
-          query = described_class.perform(action, table, primary_key, params)
+          query = described_class.perform(action, table, params, primary_key)
           expect(query).to eq("Primary key 'user_id' not found in record.")
         end
       end
@@ -45,7 +45,7 @@ RSpec.describe Multiwoven::Integrations::Core::QueryBuilder do
       let(:primary_key) { "" } # Not used
 
       it "returns an invalid action specified message" do
-        query = described_class.perform(action, table, primary_key, params)
+        query = described_class.perform(action, table, params, primary_key)
         expect(query).to eq("Invalid action specified.")
       end
     end
