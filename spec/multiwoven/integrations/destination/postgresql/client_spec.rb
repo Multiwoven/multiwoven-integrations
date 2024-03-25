@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Multiwoven::Integrations::Destination::Postgresql::Client do
+RSpec.describe Multiwoven::Integrations::Destination::Postgresql::Client do # rubocop:disable Metrics/BlockLength
   let(:client) { Multiwoven::Integrations::Destination::Postgresql::Client.new }
   let(:sync_config) do
     {
@@ -20,10 +20,18 @@ RSpec.describe Multiwoven::Integrations::Destination::Postgresql::Client do
         }
       },
       "destination": {
-        "name": "DestinationConnectorName",
+        "name": "Postgresql",
         "type": "destination",
         "connection_specification": {
-          "example_destination_key": "example_destination_value"
+          "credentials": {
+            "auth_type": "username/password",
+            "username": ENV["POSTGRESQL_USERNAME"],
+            "password": ENV["POSTGRESQL_PASSWORD"]
+          },
+          "host": "test.pg.com",
+          "port": "8080",
+          "database": "test_database",
+          "schema": "test_schema"
         }
       },
       "model": {
@@ -33,15 +41,9 @@ RSpec.describe Multiwoven::Integrations::Destination::Postgresql::Client do
         "primary_key": "id"
       },
       "stream": {
-        "name": "example_stream", "action": "create",
-        "json_schema": { "field1": "type1" },
-        "supported_sync_modes": %w[full_refresh incremental],
-        "source_defined_cursor": true,
-        "default_cursor_field": ["field1"],
-        "source_defined_primary_key": [["field1"], ["field2"]],
-        "namespace": "exampleNamespace",
-        "url": "https://api.example.com/data",
-        "method": "GET"
+        "name": "users", "action": "create",
+        "json_schema": { "user_id": "string", "email": "string", "location": "string" },
+        "supported_sync_modes": %w[full_refresh incremental]
       },
       "sync_mode": "full_refresh",
       "cursor_field": "timestamp",
@@ -51,6 +53,27 @@ RSpec.describe Multiwoven::Integrations::Destination::Postgresql::Client do
 
   let(:pg_connection) { instance_double(PG::Connection) }
   let(:pg_result) { instance_double(PG::Result) }
+
+  let(:records) do
+    [
+      Multiwoven::Integrations::Protocol::RecordMessage.new(
+        data: {
+          email: "user1@example.com",
+          location: "New York",
+          user_id: 1
+        },
+        emitted_at: Time.now.to_i
+      ),
+      Multiwoven::Integrations::Protocol::RecordMessage.new(
+        data: {
+          email: "user2@example.com",
+          location: "San Francisco",
+          user_id: 2
+        },
+        emitted_at: Time.now.to_i
+      )
+    ]
+  end
 
   describe "#check_connection" do
     context "when the connection is successful" do
@@ -78,6 +101,32 @@ RSpec.describe Multiwoven::Integrations::Destination::Postgresql::Client do
   end
 
   # write specs
+
+  describe "#write" do
+    context "success" do
+      it "write records successfully" do
+        s_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json)
+        allow(PG).to receive(:connect).and_return(pg_connection)
+
+        allow(pg_connection).to receive(:exec).and_return(true)
+
+        tracking = subject.write(s_config, [records.first.data.transform_keys(&:to_s)]).tracking
+        expect(tracking.success).to eql(1)
+      end
+    end
+
+    context "failure" do
+      it "handle record write failures" do
+        s_config = Multiwoven::Integrations::Protocol::SyncConfig.from_json(sync_config.to_json)
+        allow(PG).to receive(:connect).and_return(pg_connection)
+
+        allow(pg_connection).to receive(:exec).and_raise(StandardError.new("test error"))
+
+        tracking = subject.write(s_config, [records.first.data.transform_keys(&:to_s)]).tracking
+        expect(tracking.failed).to eql(1)
+      end
+    end
+  end
 
   describe "#discover" do
     it "discovers schema successfully" do

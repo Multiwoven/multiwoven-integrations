@@ -4,8 +4,8 @@ RSpec.describe Multiwoven::Integrations::Core::QueryBuilder do
   describe ".perform" do
     let(:table) { "users" }
 
-    context "when action is create" do
-      let(:action) { "create" }
+    context "when action is insert" do
+      let(:action) { "insert" }
       let(:params) { { "email" => "user@example.com", "name" => "John Doe" } }
       let(:primary_key) { "" } # Not used in creation
 

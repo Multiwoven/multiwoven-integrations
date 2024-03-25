@@ -5,7 +5,7 @@ module Multiwoven
     class QueryBuilder
       def self.perform(action, table, record, primary_key = nil)
         case action.downcase
-        when "create"
+        when "insert"
           columns = record.keys.join(", ")
           values = record.values.map { |value| "'#{value}'" }.join(", ")
           # TODO: support bulk insert

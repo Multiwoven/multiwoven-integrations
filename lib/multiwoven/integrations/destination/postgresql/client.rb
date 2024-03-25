@@ -5,7 +5,7 @@ require "pg"
 module Multiwoven::Integrations::Destination
   module Postgresql
     include Multiwoven::Integrations::Core
-    class Client < DestinationConnector
+    class Client < DestinationConnector # rubocop:disable Metrics/ClassLength
       def check_connection(connection_config)
         connection_config = connection_config.with_indifferent_access
         create_connection(connection_config)
@@ -43,7 +43,33 @@ module Multiwoven::Integrations::Destination
         db&.close
       end
 
-      def write(_sync_config, _records, _action = "insert"); end
+      def write(sync_config, records, action = "insert")
+        connection_config = sync_config.destination.connection_specification.with_indifferent_access
+        connection_config = connection_config.with_indifferent_access
+        table_name = sync_config.stream.name
+        db = create_connection(connection_config)
+
+        write_success = 0
+        write_failure = 0
+
+        records.each do |record|
+          query = Multiwoven::Integrations::Core::QueryBuilder.perform(action, table_name, record)
+          begin
+            db.exec(query)
+            write_success += 1
+          rescue StandardError => e
+            handle_exception("POSTGRESQL:RECORD:WRITE:EXCEPTION", "error", e)
+            write_failure += 1
+          end
+        end
+        tracking_message(write_success, write_failure)
+      rescue StandardError => e
+        handle_exception(
+          "POSTGRESQL:WRITE:EXCEPTION",
+          "error",
+          e
+        )
+      end
 
       private
 
@@ -86,6 +112,12 @@ module Multiwoven::Integrations::Destination
             end
           }
         end
+      end
+
+      def tracking_message(success, failure)
+        Multiwoven::Integrations::Protocol::TrackingMessage.new(
+          success: success, failed: failure
+        ).to_multiwoven_message
       end
     end
   end
