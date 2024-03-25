@@ -35,6 +35,7 @@ require_relative "integrations/core/base_connector"
 require_relative "integrations/core/source_connector"
 require_relative "integrations/core/destination_connector"
 require_relative "integrations/core/http_client"
+require_relative "integrations/core/query_builder"
 
 # Source
 require_relative "integrations/source/snowflake/client"
