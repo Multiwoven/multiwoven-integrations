@@ -24,6 +24,7 @@ module Multiwoven
     )
     LogLevel = Types::String.enum("fatal", "error", "warn", "info", "debug", "trace")
     RequestRateLimitingUnit = Types::String.default("minute").enum("minute", "hour", "day")
+    SchemaMode = Types::String.enum("schema", "schemaless")
 
     class ProtocolModel < Dry::Struct
       extend Multiwoven::Integrations::Core::Utils
@@ -146,6 +147,7 @@ module Multiwoven
       attribute? :request_rate_limit, Types::Integer.default(60)
       attribute? :request_rate_limit_unit, RequestRateLimitingUnit
       attribute? :request_rate_concurrency, Types::Integer.default(10)
+      attribute? :schema_mode, Types::Array.of(SchemaMode).optional.default(["schema"])
 
       def to_multiwoven_message
         MultiwovenMessage.new(

@@ -79,7 +79,8 @@ module Multiwoven
           streams: streams,
           request_rate_limit: catalog_json["request_rate_limit"] || 60,
           request_rate_limit_unit: catalog_json["request_rate_limit_unit"] || "minute",
-          request_rate_concurrency: catalog_json["request_rate_concurrency"] || 10
+          request_rate_concurrency: catalog_json["request_rate_concurrency"] || 10,
+          schema_mode: catalog_json["schema_mode"] || ["schema"]
         )
       end
 
