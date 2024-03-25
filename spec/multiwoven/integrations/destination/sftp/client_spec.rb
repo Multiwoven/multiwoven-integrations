@@ -12,10 +12,10 @@ RSpec.describe Multiwoven::Integrations::Destination::Sftp::Client do # rubocop:
   let(:mock_sftp_file) { double("Net::SFTP::Operations::File") }
   let(:connection_config) do
     {
-      host: "us-east-1.sftpcloud.io",
-      username: "6c7e66fc97ea4117930e067ffe0f9e86",
+      host: "test_host",
+      username: "test_username",
       port: 22,
-      password: "GKaLR83FssF87WCftbqhm4U4Tc6TGize",
+      password: "test_password",
       destination_path: "/"
     }.with_indifferent_access
   end
