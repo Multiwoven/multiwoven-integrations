@@ -8,6 +8,7 @@ module Multiwoven
         when "create"
           columns = record.keys.join(", ")
           values = record.values.map { |value| "'#{value}'" }.join(", ")
+          # TODO: support bulk insert
           "INSERT INTO #{table} (#{columns}) VALUES (#{values});"
         when "update"
           # Ensure primary key is a string and exists within record for the WHERE clause
