@@ -5,7 +5,7 @@ require "pg"
 module Multiwoven::Integrations::Destination
   module Postgresql
     include Multiwoven::Integrations::Core
-    class Client < DestinationConnector # rubocop:disable Metrics/ClassLength
+    class Client < DestinationConnector
       def check_connection(connection_config)
         connection_config = connection_config.with_indifferent_access
         create_connection(connection_config)
@@ -45,7 +45,6 @@ module Multiwoven::Integrations::Destination
 
       def write(sync_config, records, action = "insert")
         connection_config = sync_config.destination.connection_specification.with_indifferent_access
-        connection_config = connection_config.with_indifferent_access
         table_name = sync_config.stream.name
         db = create_connection(connection_config)
 
