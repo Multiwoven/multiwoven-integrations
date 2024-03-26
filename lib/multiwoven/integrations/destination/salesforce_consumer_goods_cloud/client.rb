@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "stringio"
+require_relative "schema_helper"
 
 module Multiwoven
   module Integrations
@@ -9,6 +10,7 @@ module Multiwoven
         include Multiwoven::Integrations::Core
 
         API_VERSION = "59.0"
+        SALESFORCE_OBJECTS = %w[Account User Visit RetailStore RecordType].freeze
 
         class Client < DestinationConnector
           prepend Multiwoven::Integrations::Core::RateLimiter
@@ -21,14 +23,21 @@ module Multiwoven
             failure_status(e)
           end
 
-          def discover(_connection_config = nil)
-            catalog = build_catalog(load_catalog)
+          def discover(connection_config)
+            connection_config = connection_config.with_indifferent_access
+            initialize_client(connection_config)
+            catalog = build_catalog(load_catalog.with_indifferent_access)
+            streams = catalog[:streams]
+            SALESFORCE_OBJECTS.each do |object|
+              object_description = @client.describe(object)
+              streams << JSON.parse(SchemaHelper.create_json_schema_for_object(object_description).to_json)
+            end
             catalog.to_multiwoven_message
           rescue StandardError => e
             handle_exception("SALESFORCE:CONSUMER:GOODS:ClOUD:DISCOVER:EXCEPTION", "error", e)
           end
 
-          def write(sync_config, records, action = "create")
+          def write(sync_config, records, action = "upsert")
             @action = sync_config.stream.action || action
             initialize_client(sync_config.destination.connection_specification)
             process_records(records, sync_config.stream)
@@ -40,12 +49,11 @@ module Multiwoven
 
           def initialize_client(config)
             config = config.with_indifferent_access
-            @client = Restforce.new(oauth_token: config[:access_token],
-                                    refresh_token: config[:refresh_token],
-                                    instance_url: config[:instance_url],
+            @client = Restforce.new(username: config[:username],
+                                    password: config[:password] + config[:security_token],
+                                    host: config[:host],
                                     client_id: config[:client_id],
                                     client_secret: config[:client_secret],
-                                    authentication_callback: proc { |x| log_debug(x.to_s) },
                                     api_version: API_VERSION)
           end
 
@@ -77,7 +85,8 @@ module Multiwoven
           def build_args(action, stream_name, record)
             case action
             when :upsert
-              [stream_name, record[:external_key], record]
+              # TODO: Add external key instead of ID for upsert
+              [stream_name, "Id", record]
             when :destroy
               [stream_name, record[:id]]
             else
