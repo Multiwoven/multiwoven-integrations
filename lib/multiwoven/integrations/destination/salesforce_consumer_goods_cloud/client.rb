@@ -37,7 +37,7 @@ module Multiwoven
             handle_exception("SALESFORCE:CONSUMER:GOODS:ClOUD:DISCOVER:EXCEPTION", "error", e)
           end
 
-          def write(sync_config, records, action = "upsert")
+          def write(sync_config, records, action = "create")
             @action = sync_config.stream.action || action
             initialize_client(sync_config.destination.connection_specification)
             process_records(records, sync_config.stream)
@@ -77,21 +77,9 @@ module Multiwoven
           end
 
           def send_data_to_salesforce(stream_name, record = {})
-            method_name = "#{@action}!"
-            args = build_args(@action, stream_name, record)
+            method_name = "upsert!"
+            args = [stream_name, "Id", record]
             @client.send(method_name, *args)
-          end
-
-          def build_args(action, stream_name, record)
-            case action
-            when :upsert
-              # TODO: Add external key instead of ID for upsert
-              [stream_name, "Id", record]
-            when :destroy
-              [stream_name, record[:id]]
-            else
-              [stream_name, record]
-            end
           end
 
           def authenticate_client
